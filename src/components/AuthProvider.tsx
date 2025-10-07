@@ -23,18 +23,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
+        console.log('Initializing auth...')
         // Проверяем токен в localStorage
         const token = localStorage.getItem('auth_token')
         if (token) {
+          console.log('Found token, validating...')
           // Валидируем токен и загружаем пользователя
           await validateToken(token)
         } else {
+          console.log('No token found, checking Telegram Web App...')
           // Пытаемся получить данные из Telegram Web App
           const tgUser = getTelegramWebAppData()
           if (tgUser) {
+            console.log('Telegram user found, authenticating...', tgUser)
             // Авторизуемся через Telegram
             await authenticateWithTelegram(tgUser)
           } else {
+            console.log('No Telegram user found, stopping loading')
             setLoading(false)
           }
         }
@@ -52,7 +57,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setError('Таймаут загрузки. Проверьте подключение к интернету.')
         setLoading(false)
       }
-    }, 10000) // 10 секунд таймаут
+    }, 30000) // 30 секунд таймаут
 
     initializeAuth()
 

@@ -15,7 +15,13 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Stellex - Банк со звездами Telegram",
   description: "Современный банк с поддержкой звезд Telegram. Создавайте карты, переводите деньги, пополняйте звездами.",
-  viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
   themeColor: "#8B5CF6",
 };
 
