@@ -36,7 +36,8 @@ export default function SettingsPage({ user, onBack, onUpdateUser }: SettingsPag
     first_name: user.first_name || '',
     last_name: user.last_name || '',
     email: user.email || '',
-    username: user.username || ''
+    phone: user.phone || '',
+    address: user.address || ''
   })
 
   // Security settings
@@ -65,14 +66,33 @@ export default function SettingsPage({ user, onBack, onUpdateUser }: SettingsPag
   const handleSaveProfile = async () => {
     setIsLoading(true)
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      onUpdateUser(profileData)
-      setShowSuccess(true)
-      setTimeout(() => setShowSuccess(false), 3000)
+      const response = await fetch('/api/auth/update-profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+        },
+        body: JSON.stringify({
+          first_name: profileData.first_name,
+          last_name: profileData.last_name,
+          email: profileData.email,
+          phone: profileData.phone,
+          address: profileData.address
+        })
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        onUpdateUser(data.user)
+        setShowSuccess(true)
+        setTimeout(() => setShowSuccess(false), 3000)
+      } else {
+        alert(data.error || 'Ошибка сохранения профиля')
+      }
     } catch (error) {
       console.error('Error saving profile:', error)
+      alert('Ошибка сохранения профиля')
     } finally {
       setIsLoading(false)
     }
@@ -250,15 +270,39 @@ export default function SettingsPage({ user, onBack, onUpdateUser }: SettingsPag
 
                     <div>
                       <label className="block text-sm font-medium text-white/70 mb-2">
-                        Имя пользователя
+                        Телефон
                       </label>
                       <input
-                        type="text"
-                        value={profileData.username}
-                        onChange={(e) => setProfileData(prev => ({ ...prev, username: e.target.value }))}
+                        type="tel"
+                        value={profileData.phone}
+                        onChange={(e) => setProfileData(prev => ({ ...prev, phone: e.target.value }))}
                         className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                        placeholder="Введите имя пользователя"
+                        placeholder="Введите номер телефона"
                       />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-white/70 mb-2">
+                        Адрес
+                      </label>
+                      <textarea
+                        value={profileData.address}
+                        onChange={(e) => setProfileData(prev => ({ ...prev, address: e.target.value }))}
+                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                        placeholder="Введите адрес"
+                        rows={3}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-white/70 mb-2">
+                        Telegram Username
+                      </label>
+                      <div className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white/50 flex items-center space-x-2">
+                        <span>@</span>
+                        <span>{user.username || 'Не указан'}</span>
+                        <span className="text-xs text-white/30">(из Telegram)</span>
+                      </div>
                     </div>
                   </div>
 

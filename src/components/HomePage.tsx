@@ -43,9 +43,10 @@ export default function HomePage({
 
   const getGreeting = () => {
     const hour = new Date().getHours()
-    if (hour < 12) return 'доброе утро'
-    if (hour < 18) return 'добрый день'
-    return 'добрый вечер'
+    if (hour >= 5 && hour < 12) return 'доброе утро'
+    if (hour >= 12 && hour < 17) return 'добрый день'
+    if (hour >= 17 && hour < 22) return 'добрый вечер'
+    return 'доброй ночи'
   }
 
   const totalBalance = cards.reduce((sum, card) => sum + card.balance, 0)
@@ -168,68 +169,52 @@ export default function HomePage({
                 key={card.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl p-6 text-white shadow-lg cursor-pointer hover:shadow-xl transition-shadow"
-                onClick={() => {
-                  // При нажатии на карту показываем детали
-                  showNotification('Детали карты - в разработке')
-                }}
+                className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl p-6 text-white shadow-lg"
               >
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-12 h-8 bg-white/20 rounded-lg flex items-center justify-center">
-                      <CreditCard className="w-6 h-4" />
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-14 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+                      <CreditCard className="w-7 h-5" />
                     </div>
-                    <div>
-                      <h3 className="font-bold text-lg">VISA</h3>
+                    <div className="flex flex-col">
+                      <h3 className="font-bold text-xl mb-1">VISA</h3>
                       <p className="text-white/70 text-sm">**** {card.card_number.slice(-4)}</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-2xl font-bold">{card.balance.toLocaleString('ru-RU')} ₽</p>
+                    <p className="text-3xl font-bold mb-1">{card.balance.toLocaleString('ru-RU')} ₽</p>
                     <p className="text-white/70 text-sm">Баланс</p>
                   </div>
                 </div>
                 
-                <div className="flex space-x-2">
+                <div className="grid grid-cols-4 gap-3">
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      onTopUp()
-                    }}
-                    className="flex-1 py-2 px-3 bg-white/20 rounded-xl hover:bg-white/30 transition-colors text-center"
+                    onClick={onTopUp}
+                    className="py-3 px-2 bg-white/20 rounded-xl hover:bg-white/30 transition-colors text-center"
                   >
-                    <Star className="w-4 h-4 mx-auto mb-1" />
-                    <span className="text-xs">Пополнить</span>
+                    <Star className="w-5 h-5 mx-auto mb-2" />
+                    <span className="text-xs font-medium">Пополнить</span>
                   </button>
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      onTransfer()
-                    }}
-                    className="flex-1 py-2 px-3 bg-white/20 rounded-xl hover:bg-white/30 transition-colors text-center"
+                    onClick={onTransfer}
+                    className="py-3 px-2 bg-white/20 rounded-xl hover:bg-white/30 transition-colors text-center"
                   >
-                    <Send className="w-4 h-4 mx-auto mb-1" />
-                    <span className="text-xs">Перевести</span>
+                    <Send className="w-5 h-5 mx-auto mb-2" />
+                    <span className="text-xs font-medium">Перевести</span>
                   </button>
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      onQRCode()
-                    }}
-                    className="flex-1 py-2 px-3 bg-white/20 rounded-xl hover:bg-white/30 transition-colors text-center"
+                    onClick={onQRCode}
+                    className="py-3 px-2 bg-white/20 rounded-xl hover:bg-white/30 transition-colors text-center"
                   >
-                    <QrCode className="w-4 h-4 mx-auto mb-1" />
-                    <span className="text-xs">QR код</span>
+                    <QrCode className="w-5 h-5 mx-auto mb-2" />
+                    <span className="text-xs font-medium">QR код</span>
                   </button>
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      onScan()
-                    }}
-                    className="flex-1 py-2 px-3 bg-white/20 rounded-xl hover:bg-white/30 transition-colors text-center"
+                    onClick={onScan}
+                    className="py-3 px-2 bg-white/20 rounded-xl hover:bg-white/30 transition-colors text-center"
                   >
-                    <Scan className="w-4 h-4 mx-auto mb-1" />
-                    <span className="text-xs">Сканировать</span>
+                    <Scan className="w-5 h-5 mx-auto mb-2" />
+                    <span className="text-xs font-medium">Сканировать</span>
                   </button>
                 </div>
               </motion.div>

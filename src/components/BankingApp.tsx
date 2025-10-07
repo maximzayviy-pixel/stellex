@@ -35,6 +35,7 @@ import TransactionHistoryPage from './TransactionHistoryPage'
 import SettingsPage from './SettingsPage'
 import UserTicketsModal from './UserTicketsModal'
 import HomePage from './HomePage'
+import CosmicPreloader from './CosmicPreloader'
 
 export default function BankingApp() {
   const { user, logout } = useAuth()
@@ -48,11 +49,24 @@ export default function BankingApp() {
   const [activeTab, setActiveTab] = useState<'cards' | 'history' | 'settings' | 'support'>('cards')
   const [showCardDetailsModal, setShowCardDetailsModal] = useState(false)
   const [showTickets, setShowTickets] = useState(false)
+  const [showPreloader, setShowPreloader] = useState(true)
+  const [currentUser, setCurrentUser] = useState(user)
 
   // Загружаем данные пользователя и карты
   useEffect(() => {
     if (user) {
+      setCurrentUser(user)
       loadUserData()
+    }
+  }, [user])
+
+  // Проверяем PIN-код при загрузке
+  useEffect(() => {
+    if (user) {
+      const savedPin = localStorage.getItem('user_pin')
+      if (savedPin) {
+        setShowPreloader(false)
+      }
     }
   }, [user])
 
@@ -188,6 +202,10 @@ export default function BankingApp() {
     }
   }
 
+  const handleUpdateUser = (updates: Partial<User>) => {
+    setCurrentUser(prev => ({ ...prev, ...updates }))
+  }
+
   const showNotification = (message: string) => {
     // Простое уведомление через alert, можно заменить на toast
     alert(message)
@@ -201,6 +219,16 @@ export default function BankingApp() {
           <p className="text-white">Загрузка...</p>
         </div>
       </div>
+    )
+  }
+
+  // Показываем прелоадер если нужно
+  if (showPreloader) {
+    return (
+      <CosmicPreloader
+        user={user}
+        onComplete={() => setShowPreloader(false)}
+      />
     )
   }
 
@@ -224,7 +252,7 @@ export default function BankingApp() {
       {/* Main Content */}
       {activeTab === 'cards' && (
         <HomePage
-          user={user}
+          user={currentUser}
           cards={cards}
           onCreateCard={handleCreateCard}
           onTopUp={() => setShowTopUpModal(true)}
@@ -270,9 +298,7 @@ export default function BankingApp() {
       )}
 
       {activeTab === 'settings' && (
-        <SettingsPage user={user} onBack={() => setActiveTab('cards')} onUpdateUser={(updates) => {
-          console.log('User updated:', updates)
-        }} />
+        <SettingsPage user={currentUser} onBack={() => setActiveTab('cards')} onUpdateUser={handleUpdateUser} />
       )}
 
       {/* Bottom Navigation */}
