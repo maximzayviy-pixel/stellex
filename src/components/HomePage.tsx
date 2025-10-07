@@ -39,47 +39,19 @@ export default function HomePage({
   onScan, 
   showNotification 
 }: HomePageProps) {
-  const [currentTime, setCurrentTime] = useState(new Date())
-  const [batteryLevel, setBatteryLevel] = useState(21)
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date())
-    }, 1000)
-
-    return () => clearInterval(timer)
-  }, [])
+  const [searchQuery, setSearchQuery] = useState('')
 
   const getGreeting = () => {
-    const hour = currentTime.getHours()
+    const hour = new Date().getHours()
     if (hour < 12) return 'доброе утро'
     if (hour < 18) return 'добрый день'
     return 'добрый вечер'
   }
 
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('ru-RU', { 
-      hour: '2-digit', 
-      minute: '2-digit' 
-    })
-  }
-
   const totalBalance = cards.reduce((sum, card) => sum + card.balance, 0)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-900 via-blue-900 to-indigo-900">
-      {/* System Status Bar */}
-      <div className="flex justify-between items-center px-4 pt-2 pb-1">
-        <div className="flex items-center space-x-1">
-          <div className="w-4 h-2 bg-white rounded-sm"></div>
-          <div className="w-4 h-2 bg-white rounded-sm"></div>
-        </div>
-        <div className="flex items-center space-x-1">
-          <div className="w-4 h-2 bg-white rounded-sm"></div>
-          <span className="text-white text-sm font-medium">{batteryLevel}%</span>
-          <span className="text-white text-sm font-medium">{formatTime(currentTime)}</span>
-        </div>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900">
 
       {/* Search Bar */}
       <div className="px-4 py-3">
@@ -87,8 +59,10 @@ export default function HomePage({
           <div className="flex-1 relative">
             <input
               type="text"
-              placeholder="Поиск"
-              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:ring-2 focus:ring-white/30 focus:border-transparent"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Поиск по картам и транзакциям"
+              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             />
           </div>
           <button className="p-3 bg-white/10 rounded-xl hover:bg-white/20 transition-colors">
@@ -194,12 +168,16 @@ export default function HomePage({
                 key={card.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl p-6 text-white shadow-lg"
+                className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl p-6 text-white shadow-lg cursor-pointer hover:shadow-xl transition-shadow"
+                onClick={() => {
+                  // При нажатии на карту показываем детали
+                  showNotification('Детали карты - в разработке')
+                }}
               >
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
-                      <CreditCard className="w-5 h-5" />
+                    <div className="w-12 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                      <CreditCard className="w-6 h-4" />
                     </div>
                     <div>
                       <h3 className="font-bold text-lg">VISA</h3>
@@ -212,31 +190,43 @@ export default function HomePage({
                   </div>
                 </div>
                 
-                <div className="flex space-x-3">
+                <div className="flex space-x-2">
                   <button
-                    onClick={onTopUp}
-                    className="flex-1 py-2 px-4 bg-white/20 rounded-xl hover:bg-white/30 transition-colors text-center"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onTopUp()
+                    }}
+                    className="flex-1 py-2 px-3 bg-white/20 rounded-xl hover:bg-white/30 transition-colors text-center"
                   >
                     <Star className="w-4 h-4 mx-auto mb-1" />
                     <span className="text-xs">Пополнить</span>
                   </button>
                   <button
-                    onClick={onTransfer}
-                    className="flex-1 py-2 px-4 bg-white/20 rounded-xl hover:bg-white/30 transition-colors text-center"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onTransfer()
+                    }}
+                    className="flex-1 py-2 px-3 bg-white/20 rounded-xl hover:bg-white/30 transition-colors text-center"
                   >
                     <Send className="w-4 h-4 mx-auto mb-1" />
                     <span className="text-xs">Перевести</span>
                   </button>
                   <button
-                    onClick={onQRCode}
-                    className="flex-1 py-2 px-4 bg-white/20 rounded-xl hover:bg-white/30 transition-colors text-center"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onQRCode()
+                    }}
+                    className="flex-1 py-2 px-3 bg-white/20 rounded-xl hover:bg-white/30 transition-colors text-center"
                   >
                     <QrCode className="w-4 h-4 mx-auto mb-1" />
                     <span className="text-xs">QR код</span>
                   </button>
                   <button
-                    onClick={onScan}
-                    className="flex-1 py-2 px-4 bg-white/20 rounded-xl hover:bg-white/30 transition-colors text-center"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onScan()
+                    }}
+                    className="flex-1 py-2 px-3 bg-white/20 rounded-xl hover:bg-white/30 transition-colors text-center"
                   >
                     <Scan className="w-4 h-4 mx-auto mb-1" />
                     <span className="text-xs">Сканировать</span>
