@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Проверяем лимит карт (максимум 3)
-          const { data: existingCards, error: countError } = await supabaseAdmin.value
+    const { data: existingCards, error: countError } = await supabaseAdmin.value
       .from('cards')
       .select('id')
       .eq('user_id', user_id)

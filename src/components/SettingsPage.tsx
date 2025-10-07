@@ -36,8 +36,7 @@ export default function SettingsPage({ user, onBack, onUpdateUser }: SettingsPag
     first_name: user.first_name || '',
     last_name: user.last_name || '',
     email: user.email || '',
-    phone: user.phone || '',
-    address: user.address || ''
+    phone: user.phone || ''
   })
 
   // Security settings
@@ -76,8 +75,7 @@ export default function SettingsPage({ user, onBack, onUpdateUser }: SettingsPag
           first_name: profileData.first_name,
           last_name: profileData.last_name,
           email: profileData.email,
-          phone: profileData.phone,
-          address: profileData.address
+          phone: profileData.phone
         })
       })
 
@@ -281,18 +279,6 @@ export default function SettingsPage({ user, onBack, onUpdateUser }: SettingsPag
                       />
                     </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-white/70 mb-2">
-                        Адрес
-                      </label>
-                      <textarea
-                        value={profileData.address}
-                        onChange={(e) => setProfileData(prev => ({ ...prev, address: e.target.value }))}
-                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
-                        placeholder="Введите адрес"
-                        rows={3}
-                      />
-                    </div>
 
                     <div>
                       <label className="block text-sm font-medium text-white/70 mb-2">

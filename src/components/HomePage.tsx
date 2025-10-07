@@ -169,7 +169,11 @@ export default function HomePage({
                 key={card.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl p-6 text-white shadow-lg"
+                className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl p-6 text-white shadow-lg cursor-pointer hover:shadow-xl transition-shadow"
+                onClick={() => {
+                  // При нажатии на карту показываем детали
+                  showNotification('Детали карты - в разработке')
+                }}
               >
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center space-x-4">

@@ -21,7 +21,7 @@ export async function PUT(request: NextRequest) {
       )
     }
 
-    const { first_name, last_name, email, phone, address } = await request.json()
+    const { first_name, last_name, email, phone } = await request.json()
 
     // Обновляем профиль пользователя
     const { data, error } = await supabaseAdmin.value
@@ -31,7 +31,6 @@ export async function PUT(request: NextRequest) {
         last_name: last_name || null,
         email: email || null,
         phone: phone || null,
-        address: address || null,
         updated_at: new Date().toISOString()
       })
       .eq('id', decoded.userId)
