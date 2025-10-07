@@ -1,8 +1,8 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { verifyToken } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase'
 
-export async function POST(request) {
+export async function POST(request: NextRequest) {
   try {
     const authHeader = request.headers.get('authorization')
     
@@ -33,7 +33,7 @@ export async function POST(request) {
     }
 
     // Проверяем, не привязан ли уже этот Telegram ID к другому аккаунту
-    const { data: existingTelegramUser } = await supabaseAdmin.value
+    const { data: existingTelegramUser } = await supabaseAdmin.value.value
       .from('users')
       .select('id, email')
       .eq('telegram_id', telegramId)
@@ -47,7 +47,7 @@ export async function POST(request) {
     }
 
     // Обновляем пользователя, добавляя данные Telegram
-    const { data: updatedUser, error: updateError } = await supabaseAdmin.value
+    const { data: updatedUser, error: updateError } = await supabaseAdmin.value.value
       .from('users')
       .update({
         telegram_id: telegramId,

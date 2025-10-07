@@ -1,9 +1,9 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { verifyToken } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase'
 import { calculateRublesFromStars } from '@/lib/cardUtils'
 
-export async function POST(request) {
+export async function POST(request: NextRequest) {
   try {
     const authHeader = request.headers.get('authorization')
 
@@ -35,7 +35,7 @@ export async function POST(request) {
     }
 
     // Получаем карту
-    const { data: card, error: cardError } = await supabaseAdmin
+    const { data: card, error: cardError } = await supabaseAdmin.value
       .from('cards')
       .select('*')
       .eq('id', cardId)
@@ -67,7 +67,7 @@ export async function POST(request) {
     }
 
     // Обновляем баланс карты
-    const { error: updateError } = await supabaseAdmin
+    const { error: updateError } = await supabaseAdmin.value
       .from('cards')
       .update({
         balance: card.balance + rublesAmount,
@@ -84,12 +84,12 @@ export async function POST(request) {
     }
 
     // Записываем транзакцию
-    const { error: transactionError } = await supabaseAdmin
+    const { error: transactionError } = await supabaseAdmin.value
       .from('transactions')
       .insert({
         user_id: decoded.userId,
         card_id: cardId,
-        type: 'telegram_stars_topup',
+        type: 'topup',
         amount: rublesAmount,
         description: `Пополнение на ${starsAmount} Telegram Stars`,
         status: 'completed'

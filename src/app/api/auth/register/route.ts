@@ -1,8 +1,8 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { registerEmail } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase'
 
-export async function POST(request) {
+export async function POST(request: NextRequest) {
   try {
     const { email, password, firstName, lastName } = await request.json()
 
@@ -21,7 +21,7 @@ export async function POST(request) {
     }
 
     // Проверяем, существует ли пользователь с таким email
-    const { data: existingUser } = await supabaseAdmin.value
+    const { data: existingUser } = await supabaseAdmin.value.value
       .from('users')
       .select('id')
       .eq('email', email)

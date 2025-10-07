@@ -1,8 +1,8 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
-import { X, QrCode, Download, Copy, CreditCard, ArrowRight } from 'lucide-react'
+import { X, QrCode, Download, Copy, CreditCard, ArrowRight, Scan } from 'lucide-react'
 import QRCode from 'qrcode'
 import { Card } from '@/types'
 
@@ -19,6 +19,10 @@ export default function QRCodeModal({ cards, onClose, showNotification }: QRCode
   const [description, setDescription] = useState('')
   const [qrCodeUrl, setQrCodeUrl] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
+  const [isScanning, setIsScanning] = useState(false)
+  const [scanResult, setScanResult] = useState('')
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
 
   const card = cards.find(c => c.id === selectedCard)
 
@@ -84,6 +88,54 @@ export default function QRCodeModal({ cards, onClose, showNotification }: QRCode
       console.error('Copy error:', error)
       showNotification('Ошибка копирования')
     }
+  }
+
+  const startScanning = async () => {
+    try {
+      setIsScanning(true)
+      setScanResult('')
+      
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: 'environment' } 
+      })
+      
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream
+        videoRef.current.play()
+      }
+    } catch (error) {
+      console.error('Error accessing camera:', error)
+      showNotification('Не удалось получить доступ к камере')
+      setIsScanning(false)
+    }
+  }
+
+  const stopScanning = () => {
+    setIsScanning(false)
+    if (videoRef.current && videoRef.current.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream
+      stream.getTracks().forEach(track => track.stop())
+      videoRef.current.srcObject = null
+    }
+  }
+
+  const captureAndScan = () => {
+    if (!videoRef.current || !canvasRef.current) return
+
+    const canvas = canvasRef.current
+    const video = videoRef.current
+    const context = canvas.getContext('2d')
+
+    if (!context) return
+
+    canvas.width = video.videoWidth
+    canvas.height = video.videoHeight
+    context.drawImage(video, 0, 0)
+
+    // Здесь можно добавить библиотеку для распознавания QR кодов
+    // Пока что просто показываем сообщение
+    showNotification('Функция сканирования QR кодов в разработке')
+    setScanResult('QR код не распознан')
   }
 
   return (
@@ -273,6 +325,57 @@ export default function QRCodeModal({ cards, onClose, showNotification }: QRCode
               </div>
             </div>
           )}
+
+          {/* QR Scanner */}
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Сканировать QR код</h3>
+            
+            {!isScanning ? (
+              <button
+                onClick={startScanning}
+                className="w-full py-3 px-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2"
+              >
+                <Scan className="w-5 h-5" />
+                <span>Начать сканирование</span>
+              </button>
+            ) : (
+              <div className="space-y-4">
+                <div className="relative bg-gray-100 rounded-xl overflow-hidden">
+                  <video
+                    ref={videoRef}
+                    className="w-full h-64 object-cover"
+                    autoPlay
+                    playsInline
+                  />
+                  <canvas
+                    ref={canvasRef}
+                    className="hidden"
+                  />
+                </div>
+                
+                <div className="flex space-x-3">
+                  <button
+                    onClick={captureAndScan}
+                    className="flex-1 py-2 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  >
+                    Сканировать
+                  </button>
+                  <button
+                    onClick={stopScanning}
+                    className="flex-1 py-2 px-4 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                  >
+                    Остановить
+                  </button>
+                </div>
+                
+                {scanResult && (
+                  <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <p className="text-yellow-800 text-sm">{scanResult}</p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
 
           {/* Info */}
           <div className="p-4 bg-blue-50 rounded-xl">

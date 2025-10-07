@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search') || ''
     const role = searchParams.get('role') || ''
 
-    let query = supabaseAdmin.value
+    let query = supabaseAdmin.value.value
       .from('users')
       .select(`
         *,
@@ -92,7 +92,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // Обновляем пользователя
-    const { data: updatedUser, error } = await supabaseAdmin.value
+    const { data: updatedUser, error } = await supabaseAdmin.value.value
       .from('users')
       .update({
         ...updates,
@@ -137,7 +137,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Удаляем пользователя (каскадное удаление удалит связанные карты и транзакции)
-    const { error } = await supabaseAdmin.value
+    const { error } = await supabaseAdmin.value.value
       .from('users')
       .delete()
       .eq('id', userId)

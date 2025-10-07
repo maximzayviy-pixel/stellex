@@ -366,19 +366,7 @@ export default function BankingApp() {
         )}
 
         {activeTab === 'history' && (
-          <div className="text-center py-8">
-            <History className="w-16 h-16 text-white/30 mx-auto mb-4" />
-            <h3 className="text-white font-bold text-lg mb-2">История транзакций</h3>
-            <p className="text-white/70 mb-4">Просматривайте все ваши операции</p>
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => setShowTransactionHistory(true)}
-              className="py-3 px-6 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold rounded-xl hover:from-purple-700 hover:to-blue-700 transition-all duration-300"
-            >
-              Открыть историю
-            </motion.button>
-          </div>
+          <TransactionHistory onClose={() => {}} />
         )}
 
         {activeTab === 'support' && (
@@ -408,19 +396,9 @@ export default function BankingApp() {
         )}
 
         {activeTab === 'settings' && (
-          <div className="text-center py-8">
-            <Settings className="w-16 h-16 text-white/30 mx-auto mb-4" />
-            <h3 className="text-white font-bold text-lg mb-2">Настройки</h3>
-            <p className="text-white/70 mb-4">Управление профилем и настройками</p>
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => setShowSettings(true)}
-              className="py-3 px-6 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold rounded-xl hover:from-purple-700 hover:to-blue-700 transition-all duration-300"
-            >
-              Открыть настройки
-            </motion.button>
-          </div>
+          <SettingsModal user={user} onClose={() => {}} onUpdateUser={(updates) => {
+            console.log('User updated:', updates)
+          }} />
         )}
       </div>
 
@@ -479,22 +457,6 @@ export default function BankingApp() {
           />
         )}
 
-        {showTransactionHistory && (
-          <TransactionHistory
-            onClose={() => setShowTransactionHistory(false)}
-          />
-        )}
-
-        {showSettings && (
-          <SettingsModal
-            user={user}
-            onClose={() => setShowSettings(false)}
-            onUpdateUser={(updates) => {
-              // Обновляем пользователя в контексте
-              console.log('User updated:', updates)
-            }}
-          />
-        )}
 
         {showTickets && (
           <UserTicketsModal

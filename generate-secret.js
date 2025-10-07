@@ -35,3 +35,4 @@ console.log('2. Добавьте JWT_SECRET с первым значением')
 console.log('3. Добавьте TELEGRAM_WEBHOOK_SECRET со вторым значением');
 console.log('4. Выберите окружения: Production, Preview');
 console.log('5. Нажмите Save и перезапустите приложение');
+

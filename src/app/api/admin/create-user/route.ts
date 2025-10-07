@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Проверяем, существует ли пользователь с таким email
-    const { data: existingUser } = await supabaseAdmin.value
+    const { data: existingUser } = await supabaseAdmin.value.value
       .from('users')
       .select('id')
       .eq('email', email)
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     const passwordHash = await bcrypt.hash(password, 10)
 
     // Создаем пользователя
-    const { data: user, error: userError } = await supabaseAdmin.value
+    const { data: user, error: userError } = await supabaseAdmin.value.value
       .from('users')
       .insert({
         email,
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
     if (role === 'developer') {
       const apiKey = `sk_${uuidv4().replace(/-/g, '')}`
       
-      const { error: developerError } = await supabaseAdmin.value
+      const { error: developerError } = await supabaseAdmin.value.value
         .from('developers')
         .insert({
           user_id: user.id,

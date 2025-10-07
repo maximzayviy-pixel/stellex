@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Получаем карту отправителя
-    const { data: fromCard, error: fromCardError } = await supabaseAdmin
+    const { data: fromCard, error: fromCardError } = await supabaseAdmin.value
       .from('cards')
       .select('*')
       .eq('id', fromCardId)
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Получаем карту получателя
-    const { data: toCard, error: toCardError } = await supabaseAdmin
+    const { data: toCard, error: toCardError } = await supabaseAdmin.value
       .from('cards')
       .select('*')
       .eq('card_number', toCardNumber)
@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
     const newToBalance = toCard.balance + amount
 
     // Обновляем баланс карты отправителя
-    const { error: updateFromError } = await supabaseAdmin
+    const { error: updateFromError } = await supabaseAdmin.value
       .from('cards')
       .update({ balance: newFromBalance })
       .eq('id', fromCardId)
@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Обновляем баланс карты получателя
-    const { error: updateToError } = await supabaseAdmin
+    const { error: updateToError } = await supabaseAdmin.value
       .from('cards')
       .update({ balance: newToBalance })
       .eq('id', toCard.id)
@@ -131,12 +131,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Создаем записи транзакций
-    const { error: transactionFromError } = await supabaseAdmin
+    const { error: transactionFromError } = await supabaseAdmin.value
       .from('transactions')
       .insert({
         user_id: decoded.userId,
         card_id: fromCardId,
-        type: 'transfer_out',
+        type: 'transfer',
         amount: -amount,
         description: `Перевод на карту ${toCardNumber}`,
         status: 'completed'
@@ -146,12 +146,12 @@ export async function POST(request: NextRequest) {
       console.error('Transaction from error:', transactionFromError)
     }
 
-    const { error: transactionToError } = await supabaseAdmin
+    const { error: transactionToError } = await supabaseAdmin.value
       .from('transactions')
       .insert({
         user_id: toCard.user_id,
         card_id: toCard.id,
-        type: 'transfer_in',
+        type: 'transfer',
         amount: amount,
         description: `Перевод с карты ${fromCard.card_number}`,
         status: 'completed'

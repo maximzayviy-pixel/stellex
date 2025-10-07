@@ -17,3 +17,4 @@ for file in src/app/api/**/route.ts; do
 done
 
 echo "All API routes fixed!"
+

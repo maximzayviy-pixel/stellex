@@ -80,3 +80,4 @@ export default function LoginScreen({ onRetry }: LoginScreenProps) {
     </motion.div>
   )
 }
+

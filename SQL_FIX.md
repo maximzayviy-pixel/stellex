@@ -176,3 +176,4 @@ CREATE POLICY "Admins can update all support tickets" ON support_tickets FOR UPD
 ---
 
 **После выполнения этих шагов ваша база данных будет работать корректно! 🎉**
+

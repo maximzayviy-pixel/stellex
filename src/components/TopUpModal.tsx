@@ -222,3 +222,4 @@ export default function TopUpModal({ card, onClose, onTopUp }: TopUpModalProps) 
     </motion.div>
   )
 }
+

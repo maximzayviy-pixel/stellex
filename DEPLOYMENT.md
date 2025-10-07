@@ -211,3 +211,4 @@ curl -X POST https://your-app.vercel.app/api/cards \
 ---
 
 **Удачи с вашим банковским приложением! 🚀💰**
+

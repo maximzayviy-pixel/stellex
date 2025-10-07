@@ -281,3 +281,4 @@ export default function LandingPage({ onLogin, onRegister }: LandingPageProps) {
     </div>
   )
 }
+

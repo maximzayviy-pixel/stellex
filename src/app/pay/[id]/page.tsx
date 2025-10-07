@@ -214,3 +214,4 @@ export default function PaymentPage({ params }: PaymentPageProps) {
     </div>
   )
 }
+

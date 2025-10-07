@@ -126,3 +126,4 @@ export type TransactionType = 'topup' | 'payment' | 'card_creation' | 'transfer_
 export type UserRole = 'user' | 'developer' | 'support' | 'admin';
 export type TicketStatus = 'open' | 'in_progress' | 'resolved' | 'closed';
 export type TicketPriority = 'low' | 'medium' | 'high' | 'urgent';
+

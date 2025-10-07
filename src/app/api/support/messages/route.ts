@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Получаем сообщения заявки
-    const { data: messages, error } = await supabaseAdmin.value
+    const { data: messages, error } = await supabaseAdmin.value.value
       .from('support_messages')
       .select(`
         *,
@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Создаем сообщение
-    const { data: supportMessage, error } = await supabaseAdmin.value
+    const { data: supportMessage, error } = await supabaseAdmin.value.value
       .from('support_messages')
       .insert({
         ticket_id: ticketId,
@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
 
     // Обновляем статус заявки на "в работе" если ответил саппорт
     if (['support', 'admin'].includes(decodedToken.role)) {
-      await supabaseAdmin.value
+      await supabaseAdmin.value.value
         .from('support_tickets')
         .update({ 
           status: 'in_progress',

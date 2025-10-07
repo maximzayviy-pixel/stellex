@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Получаем карты пользователя
-    const { data: cards, error: cardsError } = await supabaseAdmin.value
+    const { data: cards, error: cardsError } = await supabaseAdmin.value.value
       .from('cards')
       .select('id, balance')
       .eq('user_id', userId)
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
       : Math.max(0, card.balance - amount)
 
     // Обновляем баланс карты
-    const { error: updateError } = await supabaseAdmin.value
+    const { error: updateError } = await supabaseAdmin.value.value
       .from('cards')
       .update({ 
         balance: newBalance,
@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Создаем запись транзакции
-    const { error: transactionError } = await supabaseAdmin.value
+    const { error: transactionError } = await supabaseAdmin.value.value
       .from('transactions')
       .insert({
         user_id: userId,

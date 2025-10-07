@@ -105,3 +105,4 @@ export default function TelegramInstructions({ onRetry }: TelegramInstructionsPr
     </motion.div>
   )
 }
+
