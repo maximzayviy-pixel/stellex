@@ -5,6 +5,7 @@ import { User } from '@/types'
 import { getTelegramWebAppData, isTelegramWebApp } from '@/lib/telegramUtils'
 import LoadingError from './LoadingError'
 import LoginScreen from './LoginScreen'
+import WebLoginForm from './WebLoginForm'
 
 interface AuthContextType {
   user: User | null
@@ -21,6 +22,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showLoginScreen, setShowLoginScreen] = useState(false)
+  const [showWebLogin, setShowWebLogin] = useState(false)
 
   useEffect(() => {
     const initializeAuth = async () => {
@@ -52,8 +54,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               setLoading(false)
             }
           } else {
-            console.log('Not in Telegram Web App, showing login screen')
-            setShowLoginScreen(true)
+            console.log('Not in Telegram Web App, showing web login form')
+            setShowWebLogin(true)
             setLoading(false)
           }
         }
@@ -67,8 +69,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Добавляем таймаут для предотвращения бесконечной загрузки
     const timeoutId = setTimeout(() => {
       if (loading) {
-        console.warn('Auth initialization timeout, showing login screen')
-        setShowLoginScreen(true)
+        console.warn('Auth initialization timeout, showing web login form')
+        setShowWebLogin(true)
         setLoading(false)
       }
     }, 10000) // 10 секунд таймаут
@@ -150,6 +152,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const retryAuth = () => {
     setError(null)
     setShowLoginScreen(false)
+    setShowWebLogin(false)
     setLoading(true)
     // Повторяем инициализацию
     const token = localStorage.getItem('auth_token')
@@ -164,9 +167,112 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setLoading(false)
         }
       } else {
-        setShowLoginScreen(true)
+        setShowWebLogin(true)
         setLoading(false)
       }
+    }
+  }
+
+  const handleWebLogin = async (email: string, password: string) => {
+    try {
+      setLoading(true)
+      setError(null)
+
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        setUser(data.user)
+        localStorage.setItem('auth_token', data.token)
+        setShowWebLogin(false)
+      } else {
+        setError(data.error)
+      }
+    } catch (error) {
+      console.error('Web login error:', error)
+      setError('Ошибка входа')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleWebRegister = async (email: string, password: string, firstName: string, lastName?: string) => {
+    try {
+      setLoading(true)
+      setError(null)
+
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password, firstName, lastName })
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        setUser(data.user)
+        localStorage.setItem('auth_token', data.token)
+        setShowWebLogin(false)
+      } else {
+        setError(data.error)
+      }
+    } catch (error) {
+      console.error('Web registration error:', error)
+      setError('Ошибка регистрации')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleLinkTelegram = async () => {
+    try {
+      if (!isTelegramWebApp()) {
+        setError('Эта функция доступна только в Telegram')
+        return
+      }
+
+      const tgUser = getTelegramWebAppData()
+      if (!tgUser) {
+        setError('Не удалось получить данные Telegram')
+        return
+      }
+
+      const token = localStorage.getItem('auth_token')
+      if (!token) {
+        setError('Необходимо войти в аккаунт')
+        return
+      }
+
+      const response = await fetch('/api/auth/link-telegram', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(tgUser)
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        setUser(data.user)
+        setShowWebLogin(false)
+        setError(null)
+      } else {
+        setError(data.error)
+      }
+    } catch (error) {
+      console.error('Link Telegram error:', error)
+      setError('Ошибка привязки Telegram')
     }
   }
 
@@ -178,6 +284,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Показываем экран входа, если не в Telegram Web App
   if (showLoginScreen) {
     return <LoginScreen onRetry={retryAuth} />
+  }
+
+  // Показываем веб-форму входа/регистрации
+  if (showWebLogin) {
+    return (
+      <WebLoginForm
+        onLogin={handleWebLogin}
+        onRegister={handleWebRegister}
+        onLinkTelegram={handleLinkTelegram}
+        loading={loading}
+        error={error}
+      />
+    )
   }
 
   return (

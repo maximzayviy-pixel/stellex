@@ -181,6 +181,43 @@ export async function registerEmail(email: string, password: string, firstName: 
   }
 }
 
+export async function loginEmail(email: string, password: string): Promise<AuthResult> {
+  try {
+    // Находим пользователя по email
+    const { data: user, error: userError } = await supabase.value
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .single()
+
+    if (userError || !user) {
+      return { success: false, error: 'Пользователь не найден' }
+    }
+
+    if (!user.password_hash) {
+      return { success: false, error: 'Неверный способ входа' }
+    }
+
+    // Проверяем пароль
+    const isValidPassword = await bcrypt.compare(password, user.password_hash)
+    if (!isValidPassword) {
+      return { success: false, error: 'Неверный пароль' }
+    }
+
+    // Создаем JWT токен
+    const token = jwt.sign(
+      { userId: user.id, email: user.email, role: user.role },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    )
+
+    return { success: true, user, token }
+  } catch (error) {
+    console.error('Email login error:', error)
+    return { success: false, error: 'Ошибка входа' }
+  }
+}
+
 export function verifyToken(token: string): { userId: string; telegramId?: number; role: string } | null {
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as { userId: string; telegramId?: number; role: string }
