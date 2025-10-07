@@ -32,10 +32,40 @@ export function getTelegramWebAppData(): TelegramWebAppUser | null {
 }
 
 export function isTelegramWebApp(): boolean {
-  return typeof window !== 'undefined' && 
-         window.Telegram && 
-         window.Telegram.WebApp &&
-         window.Telegram.WebApp.initDataUnsafe
+  if (typeof window === 'undefined') {
+    console.log('isTelegramWebApp: window is undefined (server-side)')
+    return false
+  }
+  
+  // Проверяем наличие Telegram WebApp объекта
+  const hasTelegram = window.Telegram && window.Telegram.WebApp
+  
+  console.log('isTelegramWebApp: hasTelegram =', hasTelegram)
+  
+  if (!hasTelegram) {
+    console.log('isTelegramWebApp: Telegram WebApp not found')
+    return false
+  }
+  
+  // Дополнительные проверки для Telegram Web App
+  const tg = window.Telegram.WebApp
+  
+  console.log('isTelegramWebApp: tg object =', {
+    initDataUnsafe: tg.initDataUnsafe,
+    initData: tg.initData,
+    platform: tg.platform,
+    version: tg.version
+  })
+  
+  // Проверяем, что это действительно Telegram Web App
+  const isTelegram = !!(tg && 
+    (tg.initDataUnsafe !== undefined || 
+     tg.initData !== undefined ||
+     tg.platform !== undefined ||
+     tg.version !== undefined))
+  
+  console.log('isTelegramWebApp: result =', isTelegram)
+  return isTelegram
 }
 
 export function showTelegramAlert(message: string): void {

@@ -26,6 +26,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const initializeAuth = async () => {
       try {
         console.log('Initializing auth...')
+        
+        // Даем время Telegram Web App инициализироваться
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        
         // Проверяем токен в localStorage
         const token = localStorage.getItem('auth_token')
         if (token) {
