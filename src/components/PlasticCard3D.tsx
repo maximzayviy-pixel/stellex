@@ -48,14 +48,15 @@ export default function PlasticCard3D() {
         initial={{ opacity: 0, scale: 0.8, rotateY: -180 }}
         animate={{ opacity: 1, scale: 1, rotateY: 0 }}
         transition={{ duration: 1, ease: "easeOut" }}
-        className="relative w-80 h-48 bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700 rounded-2xl shadow-2xl cursor-pointer"
+        className="relative w-80 h-48 bg-gradient-to-br from-slate-800 via-slate-900 to-black rounded-2xl shadow-2xl cursor-pointer border border-white/10"
         style={{ transformStyle: 'preserve-3d' }}
       >
-        {/* Card Background Pattern */}
+        {/* Card Background Pattern - убираем лишние элементы */}
         <div className="absolute inset-0 rounded-2xl overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
-          <div className="absolute top-4 right-4 w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
-          <div className="absolute bottom-4 left-4 w-24 h-24 bg-purple-400/20 rounded-full blur-xl"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent"></div>
+          {/* Добавляем тонкие линии для премиальности */}
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
         </div>
 
         {/* Card Content */}
@@ -63,33 +64,38 @@ export default function PlasticCard3D() {
           {/* Top Section */}
           <div className="flex justify-between items-start">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg">
                 <img 
                   src="https://i.imgur.com/ogTdloq.png" 
                   alt="Stellex Logo" 
-                  className="w-6 h-6 rounded"
+                  className="w-7 h-7 rounded"
                 />
               </div>
-              <span className="text-lg font-bold">Stellex Pay</span>
+              <div>
+                <div className="text-lg font-bold tracking-wide">Stellex</div>
+                <div className="text-xs text-white/60 font-medium">PAY</div>
+              </div>
             </div>
             <div className="text-right">
-              <div className="text-xs text-white/70 mb-1">DEBIT</div>
-              <div className="w-8 h-6 bg-white/20 rounded"></div>
+              <div className="text-xs text-white/60 mb-1 font-medium tracking-wider">DEBIT</div>
+              <div className="w-12 h-8 bg-gradient-to-r from-white/20 to-white/10 rounded-lg flex items-center justify-center">
+                <div className="w-8 h-5 bg-white/30 rounded-sm"></div>
+              </div>
             </div>
           </div>
 
           {/* Middle Section */}
-          <div className="flex-1 flex items-center">
-            <div className="space-y-2">
-              <div className="text-2xl font-mono tracking-wider">6660 1234 5678 9012</div>
-              <div className="flex items-center space-x-4">
-                <div>
-                  <div className="text-xs text-white/70">VALID THRU</div>
-                  <div className="text-sm font-mono">12/28</div>
+          <div className="flex-1 flex items-center justify-center">
+            <div className="space-y-4 w-full">
+              <div className="text-2xl font-mono tracking-[0.3em] text-center">6660 1234 5678 9012</div>
+              <div className="flex justify-center items-center space-x-8">
+                <div className="text-center">
+                  <div className="text-xs text-white/60 mb-1 font-medium tracking-wider">VALID THRU</div>
+                  <div className="text-sm font-mono tracking-wider">12/28</div>
                 </div>
-                <div>
-                  <div className="text-xs text-white/70">CVV</div>
-                  <div className="text-sm font-mono">***</div>
+                <div className="text-center">
+                  <div className="text-xs text-white/60 mb-1 font-medium tracking-wider">CVV</div>
+                  <div className="text-sm font-mono tracking-wider">***</div>
                 </div>
               </div>
             </div>
@@ -98,25 +104,25 @@ export default function PlasticCard3D() {
           {/* Bottom Section */}
           <div className="flex justify-between items-end">
             <div>
-              <div className="text-xs text-white/70 mb-1">CARDHOLDER NAME</div>
-              <div className="text-sm font-semibold">JOHN DOE</div>
+              <div className="text-xs text-white/60 mb-1 font-medium tracking-wider">CARDHOLDER NAME</div>
+              <div className="text-sm font-semibold tracking-wide">JOHN DOE</div>
             </div>
             <div className="flex items-center space-x-2">
-              <div className="w-6 h-4 bg-white/20 rounded flex items-center justify-center">
-                <div className="w-4 h-3 bg-white/40 rounded-sm"></div>
+              <div className="w-8 h-6 bg-gradient-to-r from-white/20 to-white/10 rounded-lg flex items-center justify-center">
+                <div className="w-5 h-4 bg-white/40 rounded-sm"></div>
               </div>
-              <div className="text-xs text-white/70">CHIP</div>
+              <div className="text-xs text-white/60 font-medium tracking-wider">CHIP</div>
             </div>
           </div>
         </div>
 
-        {/* Holographic Effect */}
+        {/* Subtle Shine Effect */}
         <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent transform -skew-x-12 animate-pulse"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent transform -skew-x-12"></div>
         </div>
 
-        {/* Glow Effect */}
-        <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700 rounded-2xl blur opacity-30 -z-10"></div>
+        {/* Premium Glow Effect */}
+        <div className="absolute -inset-0.5 bg-gradient-to-r from-slate-600/20 via-slate-500/20 to-slate-600/20 rounded-2xl blur-sm -z-10"></div>
       </motion.div>
     </div>
   )

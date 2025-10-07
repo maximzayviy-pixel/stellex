@@ -34,8 +34,7 @@ export async function POST(request: NextRequest) {
         company_name: company_name || null,
         expected_volume,
         use_case,
-        status: 'pending',
-        created_at: new Date().toISOString()
+        status: 'pending'
       })
       .select()
       .single()

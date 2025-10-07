@@ -156,35 +156,62 @@ export default function LandingPage() {
             transition={{ duration: 0.8 }}
             className="mb-8"
           >
-            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">
-              Будущее платежей
-              <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent"> уже здесь</span>
-            </h1>
-            <p className="text-xl md:text-2xl text-white/70 mb-8 max-w-3xl mx-auto">
-              Первый банк, который работает с Telegram Stars как с реальной валютой. 
-              Создавайте карты, переводите деньги, принимайте платежи.
-            </p>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="relative"
+            >
+              {/* Премиальные декоративные элементы */}
+              <div className="absolute -top-8 -left-8 w-32 h-32 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full blur-3xl"></div>
+              <div className="absolute -bottom-8 -right-8 w-40 h-40 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full blur-3xl"></div>
+              
+              <h1 className="text-6xl md:text-8xl font-bold text-white mb-8 relative z-10">
+                <span className="bg-gradient-to-r from-white via-purple-100 to-pink-100 bg-clip-text text-transparent">
+                  Будущее платежей
+                </span>
+                <br />
+                <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent animate-pulse">
+                  уже здесь
+                </span>
+              </h1>
+              
+              <p className="text-2xl md:text-3xl text-white/80 mb-12 max-w-4xl mx-auto leading-relaxed relative z-10">
+                Первый банк, который работает с 
+                <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent font-semibold"> Telegram Stars</span> 
+                как с реальной валютой. 
+                <br />
+                Создавайте карты, переводите деньги, принимайте платежи.
+              </p>
+            </motion.div>
           </motion.div>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center mb-8"
+            className="flex flex-col sm:flex-row gap-6 justify-center mb-8"
           >
-            <a
+            <motion.a
               href="/app"
-              className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-lg font-bold rounded-2xl hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-2xl"
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.95 }}
+              className="group relative inline-flex items-center px-10 py-5 bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 text-white text-xl font-bold rounded-2xl hover:from-purple-700 hover:via-pink-700 hover:to-purple-700 transition-all duration-300 shadow-2xl shadow-purple-500/25 overflow-hidden"
             >
-              Начать сейчас
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </a>
-            <a
+              <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <span className="relative z-10">Начать сейчас</span>
+              <ArrowRight className="w-6 h-6 ml-3 relative z-10 group-hover:translate-x-1 transition-transform duration-300" />
+            </motion.a>
+            
+            <motion.a
               href="https://t.me/stellexbank_bot"
-              className="inline-flex items-center px-8 py-4 bg-blue-600 text-white text-lg font-bold rounded-2xl hover:bg-blue-700 transition-all duration-300"
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.95 }}
+              className="group relative inline-flex items-center px-10 py-5 bg-gradient-to-r from-blue-600 via-blue-700 to-blue-600 text-white text-xl font-bold rounded-2xl hover:from-blue-700 hover:via-blue-800 hover:to-blue-700 transition-all duration-300 shadow-2xl shadow-blue-500/25 overflow-hidden"
             >
-              Открыть в Telegram
-            </a>
+              <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <span className="relative z-10">Открыть в Telegram</span>
+            </motion.a>
           </motion.div>
 
           {/* Важное уведомление */}
@@ -211,24 +238,58 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
-            className="bg-gradient-to-r from-purple-600/20 to-pink-600/20 border border-purple-500/30 rounded-2xl p-8 mb-16 max-w-6xl mx-auto"
+            className="relative bg-gradient-to-br from-slate-900/50 via-slate-800/30 to-slate-900/50 border border-white/10 rounded-3xl p-12 mb-16 max-w-7xl mx-auto backdrop-blur-xl"
           >
-            <div className="text-center mb-8">
-              <h3 className="text-purple-100 font-bold text-2xl mb-2">Новинка ноября 2024</h3>
-              <h4 className="text-white font-bold text-3xl mb-4">Настоящие пластиковые карты</h4>
-              <p className="text-purple-200 text-lg max-w-2xl mx-auto">
+            {/* Премиальные декоративные элементы */}
+            <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+            <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+            <div className="absolute top-1/2 left-0 w-px h-32 bg-gradient-to-b from-transparent via-white/10 to-transparent"></div>
+            <div className="absolute top-1/2 right-0 w-px h-32 bg-gradient-to-b from-transparent via-white/10 to-transparent"></div>
+            
+            <div className="text-center mb-12">
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.6, delay: 0.8 }}
+                className="inline-block bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-full px-6 py-2 mb-6"
+              >
+                <span className="text-purple-300 font-semibold text-sm tracking-wider">НОВИНКА НОЯБРЯ 2024</span>
+              </motion.div>
+              
+              <h3 className="text-white font-bold text-4xl md:text-5xl mb-6 bg-gradient-to-r from-white via-purple-100 to-pink-100 bg-clip-text text-transparent">
+                Настоящие пластиковые карты
+              </h3>
+              
+              <p className="text-white/80 text-xl max-w-3xl mx-auto leading-relaxed">
                 Получите физическую карту, которая работает с Telegram Stars в любом магазине мира!
               </p>
             </div>
             
-            <div className="flex justify-center">
-              <PlasticCard3D />
+            <div className="flex justify-center mb-12">
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0, rotateY: -15 }}
+                animate={{ scale: 1, opacity: 1, rotateY: 0 }}
+                transition={{ duration: 1, delay: 1 }}
+                className="relative"
+              >
+                <PlasticCard3D />
+                {/* Премиальные эффекты вокруг карты */}
+                <div className="absolute -inset-8 bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-purple-500/10 rounded-3xl blur-2xl"></div>
+                <div className="absolute -inset-4 bg-gradient-to-r from-white/5 via-transparent to-white/5 rounded-2xl blur-xl"></div>
+              </motion.div>
             </div>
             
-            <div className="text-center mt-8">
-              <button className="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 px-8 rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-300">
-                Заказать карту
-              </button>
+            <div className="text-center">
+              <motion.button
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.6, delay: 1.2 }}
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+                className="bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 text-white font-bold py-4 px-12 rounded-2xl hover:from-purple-700 hover:via-pink-700 hover:to-purple-700 transition-all duration-300 shadow-2xl shadow-purple-500/25"
+              >
+                <span className="text-lg">Заказать карту</span>
+              </motion.button>
             </div>
           </motion.div>
 
