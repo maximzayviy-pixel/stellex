@@ -29,6 +29,121 @@ export default function APIDocsPage() {
 
   const sections = [
     {
+      id: 'quick-start',
+      title: 'Быстрый старт',
+      icon: <Zap className="w-5 h-5" />,
+      content: (
+        <div className="space-y-6">
+          <p className="text-white/70">
+            Начните интеграцию с Stellex Pay API за 5 минут. Следуйте этому руководству для создания первого платежа.
+          </p>
+          
+          <div className="space-y-4">
+            <h4 className="text-white font-bold text-lg">1. Получите API ключ</h4>
+            <p className="text-white/70">
+              Запросите API ключ через форму на главной странице или обратитесь к администратору.
+            </p>
+            
+            <h4 className="text-white font-bold text-lg">2. Создайте первый платеж</h4>
+            <div className="bg-black/20 rounded-xl p-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-green-400 text-sm">JavaScript</span>
+                <button
+                  onClick={() => copyToClipboard(`// Создание платежа
+const response = await fetch('https://api.stellex.space/api/payments/create', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    amount: 1000,
+    currency: 'RUB',
+    description: 'Оплата заказа #123',
+    return_url: 'https://yoursite.com/success'
+  })
+});
+
+const payment = await response.json();
+console.log('Payment created:', payment);`, 'quickstart-js')}
+                  className="p-1 hover:bg-white/10 rounded"
+                >
+                  {copiedCode === 'quickstart-js' ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
+                </button>
+              </div>
+              <pre className="text-white text-sm overflow-x-auto">
+{`// Создание платежа
+const response = await fetch('https://api.stellex.space/api/payments/create', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    amount: 1000,
+    currency: 'RUB',
+    description: 'Оплата заказа #123',
+    return_url: 'https://yoursite.com/success'
+  })
+});
+
+const payment = await response.json();
+console.log('Payment created:', payment);`}
+              </pre>
+            </div>
+            
+            <h4 className="text-white font-bold text-lg">3. Обработайте webhook</h4>
+            <div className="bg-black/20 rounded-xl p-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-green-400 text-sm">Node.js</span>
+                <button
+                  onClick={() => copyToClipboard(`// Обработка webhook
+app.post('/webhook', (req, res) => {
+  const { type, data } = req.body;
+  
+  switch (type) {
+    case 'payment.completed':
+      // Обработка успешного платежа
+      console.log('Payment completed:', data);
+      break;
+    case 'payment.failed':
+      // Обработка неудачного платежа
+      console.log('Payment failed:', data);
+      break;
+  }
+  
+  res.status(200).send('OK');
+});`, 'webhook-js')}
+                  className="p-1 hover:bg-white/10 rounded"
+                >
+                  {copiedCode === 'webhook-js' ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
+                </button>
+              </div>
+              <pre className="text-white text-sm overflow-x-auto">
+{`// Обработка webhook
+app.post('/webhook', (req, res) => {
+  const { type, data } = req.body;
+  
+  switch (type) {
+    case 'payment.completed':
+      // Обработка успешного платежа
+      console.log('Payment completed:', data);
+      break;
+    case 'payment.failed':
+      // Обработка неудачного платежа
+      console.log('Payment failed:', data);
+      break;
+  }
+  
+  res.status(200).send('OK');
+});`}
+              </pre>
+            </div>
+          </div>
+        </div>
+      )
+    },
+    {
       id: 'authentication',
       title: 'Аутентификация',
       icon: <Shield className="w-5 h-5" />,
@@ -231,6 +346,211 @@ export default function APIDocsPage() {
   }
 }`}
             </pre>
+          </div>
+        </div>
+      )
+    },
+    {
+      id: 'sdk',
+      title: 'SDK и библиотеки',
+      icon: <Code className="w-5 h-5" />,
+      content: (
+        <div className="space-y-6">
+          <p className="text-white/70">
+            Готовые SDK для популярных языков программирования и платформ.
+          </p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-white/10 rounded-xl p-6">
+              <h4 className="text-white font-bold text-lg mb-3">JavaScript/Node.js</h4>
+              <div className="bg-black/20 rounded-lg p-4 mb-4">
+                <pre className="text-white text-sm">
+{`npm install @stellex/pay-sdk
+
+import { StellexPay } from '@stellex/pay-sdk';
+
+const client = new StellexPay({
+  apiKey: 'your_api_key',
+  environment: 'sandbox' // или 'production'
+});
+
+// Создание платежа
+const payment = await client.payments.create({
+  amount: 1000,
+  currency: 'RUB',
+  description: 'Оплата заказа'
+});`}
+                </pre>
+              </div>
+              <a href="#" className="text-purple-400 hover:text-purple-300">
+                Установить SDK →
+              </a>
+            </div>
+
+            <div className="bg-white/10 rounded-xl p-6">
+              <h4 className="text-white font-bold text-lg mb-3">Python</h4>
+              <div className="bg-black/20 rounded-lg p-4 mb-4">
+                <pre className="text-white text-sm">
+{`pip install stellex-pay
+
+from stellex_pay import StellexPay
+
+client = StellexPay(
+    api_key='your_api_key',
+    environment='sandbox'
+)
+
+# Создание платежа
+payment = client.payments.create(
+    amount=1000,
+    currency='RUB',
+    description='Оплата заказа'
+)`}
+                </pre>
+              </div>
+              <a href="#" className="text-purple-400 hover:text-purple-300">
+                Установить SDK →
+              </a>
+            </div>
+
+            <div className="bg-white/10 rounded-xl p-6">
+              <h4 className="text-white font-bold text-lg mb-3">PHP</h4>
+              <div className="bg-black/20 rounded-lg p-4 mb-4">
+                <pre className="text-white text-sm">
+{`composer require stellex/pay-sdk
+
+use StellexPay\StellexPay;
+
+$client = new StellexPay([
+    'api_key' => 'your_api_key',
+    'environment' => 'sandbox'
+]);
+
+// Создание платежа
+$payment = $client->payments->create([
+    'amount' => 1000,
+    'currency' => 'RUB',
+    'description' => 'Оплата заказа'
+]);`}
+                </pre>
+              </div>
+              <a href="#" className="text-purple-400 hover:text-purple-300">
+                Установить SDK →
+              </a>
+            </div>
+
+            <div className="bg-white/10 rounded-xl p-6">
+              <h4 className="text-white font-bold text-lg mb-3">React Hook</h4>
+              <div className="bg-black/20 rounded-lg p-4 mb-4">
+                <pre className="text-white text-sm">
+{`npm install @stellex/pay-react
+
+import { useStellexPay } from '@stellex/pay-react';
+
+function PaymentForm() {
+  const { createPayment, isLoading } = useStellexPay({
+    apiKey: 'your_api_key'
+  });
+
+  const handlePayment = async () => {
+    const payment = await createPayment({
+      amount: 1000,
+      currency: 'RUB'
+    });
+  };
+
+  return (
+    <button onClick={handlePayment} disabled={isLoading}>
+      Оплатить
+    </button>
+  );
+}`}
+                </pre>
+              </div>
+              <a href="#" className="text-purple-400 hover:text-purple-300">
+                Установить Hook →
+              </a>
+            </div>
+          </div>
+        </div>
+      )
+    },
+    {
+      id: 'errors',
+      title: 'Коды ошибок',
+      icon: <Shield className="w-5 h-5" />,
+      content: (
+        <div className="space-y-6">
+          <p className="text-white/70">
+            Полный список кодов ошибок и способы их обработки.
+          </p>
+          
+          <div className="space-y-4">
+            <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4">
+              <h4 className="text-red-400 font-bold mb-2">4xx - Ошибки клиента</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-white/70">400</span>
+                  <span className="text-white">Неверный запрос</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-white/70">401</span>
+                  <span className="text-white">Не авторизован</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-white/70">403</span>
+                  <span className="text-white">Доступ запрещен</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-white/70">404</span>
+                  <span className="text-white">Не найдено</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-white/70">429</span>
+                  <span className="text-white">Превышен лимит запросов</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4">
+              <h4 className="text-yellow-400 font-bold mb-2">5xx - Ошибки сервера</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-white/70">500</span>
+                  <span className="text-white">Внутренняя ошибка сервера</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-white/70">502</span>
+                  <span className="text-white">Ошибка шлюза</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-white/70">503</span>
+                  <span className="text-white">Сервис недоступен</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
+              <h4 className="text-blue-400 font-bold mb-2">Бизнес ошибки</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-white/70">INSUFFICIENT_FUNDS</span>
+                  <span className="text-white">Недостаточно средств</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-white/70">CARD_NOT_FOUND</span>
+                  <span className="text-white">Карта не найдена</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-white/70">INVALID_AMOUNT</span>
+                  <span className="text-white">Неверная сумма</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-white/70">PAYMENT_EXPIRED</span>
+                  <span className="text-white">Платеж истек</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )

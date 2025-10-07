@@ -171,56 +171,56 @@ export default function HomePage({
                 key={card.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl p-6 text-white shadow-lg cursor-pointer hover:shadow-xl transition-shadow"
+                className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl p-4 text-white shadow-lg cursor-pointer hover:shadow-xl transition-shadow"
                 onClick={() => onCardClick(card)}
               >
-                <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center space-x-4">
-              <div className="w-14 h-10 bg-white/20 rounded-lg flex items-center justify-center">
-                <img 
-                  src="https://i.imgur.com/ogTdloq.png" 
-                  alt="Stellex Logo" 
-                  className="w-8 h-8 rounded"
-                />
-              </div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-7 bg-white/20 rounded-lg flex items-center justify-center">
+                      <img 
+                        src="https://i.imgur.com/ogTdloq.png" 
+                        alt="Stellex Logo" 
+                        className="w-6 h-6 rounded"
+                      />
+                    </div>
                     <div className="flex flex-col">
-                      <h3 className="font-bold text-xl mb-1">{card.card_name || 'VISA'}</h3>
-                      <p className="text-white/70 text-sm">**** {card.card_number.slice(-4)}</p>
+                      <h3 className="font-bold text-lg">{card.card_name || 'VISA'}</h3>
+                      <p className="text-white/70 text-xs">**** {card.card_number.slice(-4)}</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-3xl font-bold mb-1">{card.balance.toLocaleString('ru-RU')} ₽</p>
-                    <p className="text-white/70 text-sm">Баланс</p>
+                    <p className="text-2xl font-bold">{card.balance.toLocaleString('ru-RU')} ₽</p>
+                    <p className="text-white/70 text-xs">Баланс</p>
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-4 gap-3">
+                <div className="grid grid-cols-4 gap-2">
                   <button
                     onClick={onTopUp}
-                    className="py-3 px-2 bg-white/20 rounded-xl hover:bg-white/30 transition-colors text-center"
+                    className="py-2 px-1 bg-white/20 rounded-lg hover:bg-white/30 transition-colors text-center"
                   >
-                    <Star className="w-5 h-5 mx-auto mb-2" />
+                    <Star className="w-4 h-4 mx-auto mb-1" />
                     <span className="text-xs font-medium">Пополнить</span>
                   </button>
                   <button
                     onClick={onTransfer}
-                    className="py-3 px-2 bg-white/20 rounded-xl hover:bg-white/30 transition-colors text-center"
+                    className="py-2 px-1 bg-white/20 rounded-lg hover:bg-white/30 transition-colors text-center"
                   >
-                    <Send className="w-5 h-5 mx-auto mb-2" />
+                    <Send className="w-4 h-4 mx-auto mb-1" />
                     <span className="text-xs font-medium">Перевести</span>
                   </button>
                   <button
                     onClick={onQRCode}
-                    className="py-3 px-2 bg-white/20 rounded-xl hover:bg-white/30 transition-colors text-center"
+                    className="py-2 px-1 bg-white/20 rounded-lg hover:bg-white/30 transition-colors text-center"
                   >
-                    <QrCode className="w-5 h-5 mx-auto mb-2" />
+                    <QrCode className="w-4 h-4 mx-auto mb-1" />
                     <span className="text-xs font-medium">QR код</span>
                   </button>
                   <button
                     onClick={onScan}
-                    className="py-3 px-2 bg-white/20 rounded-xl hover:bg-white/30 transition-colors text-center"
+                    className="py-2 px-1 bg-white/20 rounded-lg hover:bg-white/30 transition-colors text-center"
                   >
-                    <Scan className="w-5 h-5 mx-auto mb-2" />
+                    <Scan className="w-4 h-4 mx-auto mb-1" />
                     <span className="text-xs font-medium">Сканировать</span>
                   </button>
                 </div>

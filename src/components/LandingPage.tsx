@@ -18,12 +18,17 @@ import {
   Award,
   ChevronDown,
   Menu,
-  X
+  X,
+  Key,
+  Send
 } from 'lucide-react'
+import PlasticCard3D from './PlasticCard3D'
+import ApiKeyRequestModal from './ApiKeyRequestModal'
 
 export default function LandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
+  const [showApiKeyModal, setShowApiKeyModal] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -152,14 +157,12 @@ export default function LandingPage() {
             className="mb-8"
           >
             <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">
-              Банк со
-              <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent"> звездами</span>
-              <br />
-              Telegram
+              Будущее платежей
+              <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent"> уже здесь</span>
             </h1>
             <p className="text-xl md:text-2xl text-white/70 mb-8 max-w-3xl mx-auto">
-              Современный банковский сервис с поддержкой Telegram Stars, 
-              виртуальными картами и API для разработчиков
+              Первый банк, который работает с Telegram Stars как с реальной валютой. 
+              Создавайте карты, переводите деньги, принимайте платежи.
             </p>
           </motion.div>
 
@@ -167,22 +170,66 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center mb-16"
+            className="flex flex-col sm:flex-row gap-4 justify-center mb-8"
           >
             <a
               href="/app"
               className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-lg font-bold rounded-2xl hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-2xl"
             >
-              Начать пользоваться
+              Начать сейчас
               <ArrowRight className="w-5 h-5 ml-2" />
             </a>
             <a
-              href="/api/docs"
-              className="inline-flex items-center px-8 py-4 bg-white/10 text-white text-lg font-bold rounded-2xl hover:bg-white/20 transition-all duration-300 backdrop-blur-sm"
+              href="https://t.me/stellexbank_bot"
+              className="inline-flex items-center px-8 py-4 bg-blue-600 text-white text-lg font-bold rounded-2xl hover:bg-blue-700 transition-all duration-300"
             >
-              <Code className="w-5 h-5 mr-2" />
-              Документация API
+              Открыть в Telegram
             </a>
+          </motion.div>
+
+          {/* Важное уведомление */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="bg-yellow-500/20 border border-yellow-500/30 rounded-2xl p-6 mb-16 max-w-4xl mx-auto"
+          >
+            <div className="flex items-start space-x-4">
+              <div className="text-yellow-400 text-2xl">⚠️</div>
+              <div>
+                <h3 className="text-yellow-100 font-bold text-lg mb-2">Важно!</h3>
+                <p className="text-yellow-200">
+                  Для полного функционала откройте приложение через бота @stellexbank_bot в Telegram, 
+                  а не через прямую ссылку!
+                </p>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Новинка ноября */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+            className="bg-gradient-to-r from-purple-600/20 to-pink-600/20 border border-purple-500/30 rounded-2xl p-8 mb-16 max-w-6xl mx-auto"
+          >
+            <div className="text-center mb-8">
+              <h3 className="text-purple-100 font-bold text-2xl mb-2">Новинка ноября 2024</h3>
+              <h4 className="text-white font-bold text-3xl mb-4">Настоящие пластиковые карты</h4>
+              <p className="text-purple-200 text-lg max-w-2xl mx-auto">
+                Получите физическую карту, которая работает с Telegram Stars в любом магазине мира!
+              </p>
+            </div>
+            
+            <div className="flex justify-center">
+              <PlasticCard3D />
+            </div>
+            
+            <div className="text-center mt-8">
+              <button className="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 px-8 rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-300">
+                Заказать карту
+              </button>
+            </div>
           </motion.div>
 
           {/* Stats */}
@@ -281,14 +328,23 @@ export default function LandingPage() {
                   <span className="text-white/70">Тестовый режим для разработки</span>
                 </div>
               </div>
-              <a
-                href="/api/docs"
-                className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-300"
-              >
-                <Code className="w-5 h-5 mr-2" />
-                Открыть документацию
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </a>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <a
+                  href="/api/docs"
+                  className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-300"
+                >
+                  <Code className="w-5 h-5 mr-2" />
+                  Открыть документацию
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </a>
+                <button
+                  onClick={() => setShowApiKeyModal(true)}
+                  className="inline-flex items-center px-6 py-3 bg-white/10 text-white font-bold rounded-xl hover:bg-white/20 transition-all duration-300"
+                >
+                  <Key className="w-5 h-5 mr-2" />
+                  Запросить API ключ
+                </button>
+              </div>
             </motion.div>
 
             <motion.div
@@ -407,6 +463,12 @@ app.post('/webhook', (req, res) => {
           </div>
         </div>
       </footer>
+
+      {/* API Key Request Modal */}
+      <ApiKeyRequestModal
+        isOpen={showApiKeyModal}
+        onClose={() => setShowApiKeyModal(false)}
+      />
     </div>
   )
 }

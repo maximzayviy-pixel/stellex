@@ -195,12 +195,9 @@ export default function BankingApp() {
     }
   }
 
-  const handleCardExpand = (cardId: string) => {
-    const card = cards.find(c => c.id === cardId)
-    if (card) {
-      setSelectedCard(card)
-      setShowCardDetailsModal(true)
-    }
+  const handleCardExpand = (card: Card) => {
+    setSelectedCard(card)
+    setShowCardDetailsModal(true)
   }
 
   const handleUpdateUser = (updates: Partial<User>) => {

@@ -138,6 +138,26 @@ export default function AdminDashboard() {
       })
 
       if (response.ok) {
+        const data = await response.json()
+        
+        // Если создаем разработчика, создаем его профиль
+        if (userData.role === 'developer') {
+          await fetch('/api/developer/create', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+            },
+            body: JSON.stringify({
+              user_id: data.user.id,
+              company_name: '',
+              website: '',
+              webhook_url: '',
+              commission_rate: 0.05
+            })
+          })
+        }
+        
         setShowCreateUser(false)
         loadUsers()
         alert('Пользователь успешно создан!')
