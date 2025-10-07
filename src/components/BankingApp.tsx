@@ -28,6 +28,7 @@ import { useAuth } from './AuthProvider'
 import DeveloperDashboard from './DeveloperDashboard'
 import SupportDashboard from './SupportDashboard'
 import AdminDashboard from './AdminDashboard'
+import TelegramDebug from './TelegramDebug'
 
 export default function BankingApp() {
   const { user, logout } = useAuth()
@@ -213,6 +214,7 @@ export default function BankingApp() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+      <TelegramDebug />
       {/* Header */}
       <div className="p-4 pt-12">
         <div className="flex items-center justify-between mb-6">

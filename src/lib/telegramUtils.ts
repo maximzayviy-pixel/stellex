@@ -68,6 +68,40 @@ export function isTelegramWebApp(): boolean {
   return isTelegram
 }
 
+// Функция для ожидания загрузки Telegram WebApp
+export function waitForTelegramWebApp(timeout = 5000): Promise<boolean> {
+  return new Promise((resolve) => {
+    if (typeof window === 'undefined') {
+      resolve(false)
+      return
+    }
+
+    // Если уже загружен
+    if (window.Telegram?.WebApp) {
+      console.log('Telegram WebApp already available')
+      resolve(true)
+      return
+    }
+
+    let attempts = 0
+    const maxAttempts = timeout / 100
+
+    const checkInterval = setInterval(() => {
+      attempts++
+      
+      if (window.Telegram?.WebApp) {
+        console.log('Telegram WebApp loaded after', attempts * 100, 'ms')
+        clearInterval(checkInterval)
+        resolve(true)
+      } else if (attempts >= maxAttempts) {
+        console.log('Telegram WebApp timeout after', timeout, 'ms')
+        clearInterval(checkInterval)
+        resolve(false)
+      }
+    }, 100)
+  })
+}
+
 export function showTelegramAlert(message: string): void {
   if (typeof window !== 'undefined' && window.Telegram?.WebApp) {
     window.Telegram.WebApp.showAlert(message)

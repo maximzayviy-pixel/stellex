@@ -2,7 +2,8 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { User } from '@/types'
-import { getTelegramWebAppData, isTelegramWebApp } from '@/lib/telegramUtils'
+import { getTelegramWebAppData, isTelegramWebApp, waitForTelegramWebApp } from '@/lib/telegramUtils'
+import { useTelegramWebApp } from '@/hooks/useTelegramWebApp'
 import LoadingError from './LoadingError'
 import LoginScreen from './LoginScreen'
 import WebLoginForm from './WebLoginForm'
@@ -23,14 +24,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<string | null>(null)
   const [showLoginScreen, setShowLoginScreen] = useState(false)
   const [showWebLogin, setShowWebLogin] = useState(false)
+  
+  // Используем хук для Telegram WebApp
+  const { isTelegramWebApp, isReady, user: tgUser } = useTelegramWebApp()
 
   useEffect(() => {
     const initializeAuth = async () => {
       try {
         console.log('Initializing auth...')
-        
-        // Даем время Telegram Web App инициализироваться
-        await new Promise(resolve => setTimeout(resolve, 1000))
         
         // Проверяем токен в localStorage
         const token = localStorage.getItem('auth_token')
@@ -40,11 +41,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           await validateToken(token)
         } else {
           console.log('No token found, checking Telegram Web App...')
-          // Проверяем, что мы в Telegram Web App
-          if (isTelegramWebApp()) {
+          
+          // Ждем инициализации Telegram WebApp
+          if (isTelegramWebApp && isReady) {
             console.log('In Telegram Web App, getting user data...')
-            // Пытаемся получить данные из Telegram Web App
-            const tgUser = getTelegramWebAppData()
             if (tgUser) {
               console.log('Telegram user found, authenticating...', tgUser)
               // Авторизуемся через Telegram
@@ -66,7 +66,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
-    // Добавляем таймаут для предотвращения бесконечной загрузки
+    // Запускаем инициализацию только когда Telegram WebApp готов или определенно недоступен
+    if (isReady || !isTelegramWebApp) {
+      initializeAuth()
+    }
+  }, [isTelegramWebApp, isReady, tgUser])
+
+  // Добавляем таймаут для предотвращения бесконечной загрузки
+  useEffect(() => {
     const timeoutId = setTimeout(() => {
       if (loading) {
         console.warn('Auth initialization timeout, showing web login form')
@@ -75,10 +82,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     }, 10000) // 10 секунд таймаут
 
-    initializeAuth()
-
     return () => clearTimeout(timeoutId)
-  }, [])
+  }, [loading])
 
   const validateToken = async (token: string) => {
     try {
