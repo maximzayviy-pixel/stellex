@@ -47,6 +47,8 @@ export default function BankingApp() {
   const [isLoading, setIsLoading] = useState(false)
   const [activeTab, setActiveTab] = useState<'cards' | 'history' | 'settings' | 'support'>('cards')
   const [showCardDetailsModal, setShowCardDetailsModal] = useState(false)
+  const [showTransactionHistory, setShowTransactionHistory] = useState(false)
+  const [showSettings, setShowSettings] = useState(false)
   const [showTickets, setShowTickets] = useState(false)
 
   // Загружаем данные пользователя и карты
@@ -170,12 +172,12 @@ export default function BankingApp() {
 
       if (result.success) {
         await loadUserData()
-        showNotification('Баланс пополнен звездами!')
+        showNotification('Пополнение звездами выполнено!')
       } else {
         showNotification(result.error || 'Ошибка пополнения')
       }
     } catch (error) {
-      console.error('Telegram Stars top-up error:', error)
+      console.error('Stars topup error:', error)
       showNotification('Ошибка пополнения')
     }
   }
@@ -189,9 +191,12 @@ export default function BankingApp() {
   }
 
   const showNotification = (message: string) => {
-    // Простое уведомление через alert, можно заменить на toast
+    // Простое уведомление для веб-версии
     alert(message)
   }
+
+  const totalBalance = cards.reduce((sum, card) => sum + card.balance, 0)
+  const totalStars = Math.floor(totalBalance * 2) // 1 рубль = 2 звезды
 
   if (!user) {
     return (
@@ -218,62 +223,185 @@ export default function BankingApp() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
       <TelegramDebug />
-      
-      {/* Main Content */}
-      {activeTab === 'cards' && (
-        <HomePage
-          user={user}
-          cards={cards}
-          onCreateCard={handleCreateCard}
-          onTopUp={() => setShowTopUpModal(true)}
-          onTransfer={() => setShowTransferModal(true)}
-          onQRCode={() => setShowQRCodeModal(true)}
-          onScan={() => setShowQRCodeModal(true)}
-          showNotification={showNotification}
-        />
-      )}
-
-      {activeTab === 'history' && (
-        <TransactionHistoryPage onBack={() => setActiveTab('cards')} />
-      )}
-
-      {activeTab === 'support' && (
-        <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
-          <div className="p-4 pt-12">
-            <div className="text-center py-8">
-              <MessageSquare className="w-16 h-16 text-white/30 mx-auto mb-4" />
-              <h3 className="text-white font-bold text-lg mb-2">Поддержка</h3>
-              <p className="text-white/70 mb-4">Создайте заявку или просмотрите существующие</p>
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => setShowTickets(true)}
-                  className="py-3 px-6 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold rounded-xl hover:from-purple-700 hover:to-blue-700 transition-all duration-300"
-                >
-                  Мои заявки
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => setShowTickets(true)}
-                  className="py-3 px-6 bg-gradient-to-r from-green-600 to-teal-600 text-white font-bold rounded-xl hover:from-green-700 hover:to-teal-700 transition-all duration-300"
-                >
-                  Создать заявку
-                </motion.button>
+      {/* Header */}
+      <div className="p-4 pt-12">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-2xl font-bold text-white">Stellex</h1>
+            <p className="text-white/70">Банк со звездами Telegram</p>
+          </div>
+          <div className="flex items-center space-x-3">
+            {user.email && (
+              <div className="flex items-center space-x-2 text-white/70">
+                <Mail className="w-4 h-4" />
+                <span className="text-sm">{user.email}</span>
               </div>
+            )}
+            <button
+              onClick={logout}
+              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 transition-colors"
+            >
+              <LogOut className="w-5 h-5 text-white" />
+            </button>
+          </div>
+        </div>
+
+        {/* User Info */}
+        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 mb-6">
+          <div className="flex items-center space-x-4">
+            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
+              <span className="text-white font-bold text-lg">
+                {user.first_name.charAt(0)}{user.last_name?.charAt(0) || ''}
+              </span>
+            </div>
+            <div>
+              <h2 className="text-white font-bold text-lg">
+                {user.first_name} {user.last_name || ''}
+              </h2>
+              <p className="text-white/70 text-sm">
+                {user.telegram_id ? `ID: ${user.telegram_id}` : 'Веб-пользователь'}
+              </p>
             </div>
           </div>
         </div>
-      )}
 
-      {activeTab === 'settings' && (
-        <SettingsPage user={user} onBack={() => setActiveTab('cards')} onUpdateUser={(updates) => {
-          console.log('User updated:', updates)
-        }} />
-      )}
+        {/* Balance */}
+        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-white/70 font-bold">Баланс</h3>
+            <div className="flex items-center space-x-2 text-white/70">
+              <Star className="w-4 h-4" />
+              <span className="text-sm">{totalStars} ⭐</span>
+            </div>
+          </div>
+          <div className="text-3xl font-bold text-white mb-4">
+            {totalBalance.toLocaleString('ru-RU')} ₽
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={handleCreateCard}
+              disabled={isLoading || cards.length >= 3}
+              className="py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold rounded-xl hover:from-purple-700 hover:to-blue-700 transition-all duration-300 disabled:opacity-50"
+            >
+              <Plus className="w-5 h-5 inline mr-2" />
+              Создать карту
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => setShowTelegramStarsModal(true)}
+              className="py-3 bg-gradient-to-r from-yellow-600 to-orange-600 text-white font-bold rounded-xl hover:from-yellow-700 hover:to-orange-700 transition-all duration-300"
+            >
+              <Star className="w-5 h-5 inline mr-2" />
+              Пополнить
+            </motion.button>
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="grid grid-cols-3 gap-3 mb-6">
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setShowTransferModal(true)}
+            className="p-4 bg-white/10 backdrop-blur-sm rounded-xl text-center hover:bg-white/20 transition-colors"
+          >
+            <Send className="w-6 h-6 text-white mx-auto mb-2" />
+            <span className="text-white text-sm font-medium">Перевести</span>
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setShowQRCodeModal(true)}
+            className="p-4 bg-white/10 backdrop-blur-sm rounded-xl text-center hover:bg-white/20 transition-colors"
+          >
+            <QrCode className="w-6 h-6 text-white mx-auto mb-2" />
+            <span className="text-white text-sm font-medium">QR код</span>
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="p-4 bg-white/10 backdrop-blur-sm rounded-xl text-center hover:bg-white/20 transition-colors"
+          >
+            <Scan className="w-6 h-6 text-white mx-auto mb-2" />
+            <span className="text-white text-sm font-medium">Сканировать</span>
+          </motion.button>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="px-4 pb-20 overflow-y-auto min-h-screen">
+        {activeTab === 'cards' && (
+          <>
+            <h3 className="text-white font-bold text-lg mb-4">Мои карты</h3>
+            {cards.length === 0 ? (
+              <div className="text-center py-8">
+                <CreditCard className="w-16 h-16 text-white/30 mx-auto mb-4" />
+                <p className="text-white/70 mb-4">У вас пока нет карт</p>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleCreateCard}
+                  className="py-3 px-6 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold rounded-xl hover:from-purple-700 hover:to-blue-700 transition-all duration-300"
+                >
+                  Создать первую карту
+                </motion.button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {cards.map((card) => (
+                  <VirtualCard
+                    key={card.id}
+                    card={card}
+                    compact={true}
+                    onExpand={() => handleCardExpand(card.id)}
+                  />
+                ))}
+              </div>
+            )}
+          </>
+        )}
+
+        {activeTab === 'history' && (
+          <TransactionHistoryPage onBack={() => setActiveTab('cards')} />
+        )}
+
+        {activeTab === 'support' && (
+          <div className="text-center py-8">
+            <MessageSquare className="w-16 h-16 text-white/30 mx-auto mb-4" />
+            <h3 className="text-white font-bold text-lg mb-2">Поддержка</h3>
+            <p className="text-white/70 mb-4">Создайте заявку или просмотрите существующие</p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setShowTickets(true)}
+                className="py-3 px-6 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold rounded-xl hover:from-purple-700 hover:to-blue-700 transition-all duration-300"
+              >
+                Мои заявки
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setShowTickets(true)}
+                className="py-3 px-6 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all duration-300"
+              >
+                Создать заявку
+              </motion.button>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'settings' && (
+          <SettingsPage user={user} onBack={() => setActiveTab('cards')} onUpdateUser={(updates) => {
+            console.log('User updated:', updates)
+          }} />
+        )}
+      </div>
 
       {/* Bottom Navigation */}
       <BottomNavigation activeTab={activeTab} onTabChange={setActiveTab} />
@@ -329,6 +457,7 @@ export default function BankingApp() {
             onStarsTopUp={() => setShowTelegramStarsModal(true)}
           />
         )}
+
 
         {showTickets && (
           <UserTicketsModal
