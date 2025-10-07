@@ -14,10 +14,14 @@ import {
   Plus,
   ExternalLink,
   Webhook,
-  DollarSign
+  DollarSign,
+  Play
 } from 'lucide-react'
 import { Developer, PaymentRequest } from '@/types'
 import { useAuth } from './AuthProvider'
+import ButtonGenerator from './ButtonGenerator'
+import DeveloperSandbox from './DeveloperSandbox'
+import DeveloperDocs from './DeveloperDocs'
 
 export default function DeveloperDashboard() {
   const { user } = useAuth()
@@ -25,7 +29,18 @@ export default function DeveloperDashboard() {
   const [paymentRequests, setPaymentRequests] = useState<PaymentRequest[]>([])
   const [showApiKey, setShowApiKey] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState<'overview' | 'payments' | 'settings' | 'docs'>('overview')
+  const [activeTab, setActiveTab] = useState<'overview' | 'payments' | 'settings' | 'docs' | 'button-generator' | 'sandbox'>('overview')
+  const [showButtonGenerator, setShowButtonGenerator] = useState(false)
+  const [showSandbox, setShowSandbox] = useState(false)
+  const [showDocs, setShowDocs] = useState(false)
+  const [payments, setPayments] = useState([])
+  const [paymentStats, setPaymentStats] = useState({
+    total_payments: 0,
+    completed_payments: 0,
+    total_amount: 0,
+    pending_amount: 0,
+    success_rate: 0
+  })
 
   useEffect(() => {
     if (user) {
@@ -108,6 +123,26 @@ export default function DeveloperDashboard() {
     } catch (error) {
       console.error('Error generating API key:', error)
       alert('Ошибка генерации API ключа')
+    }
+  }
+
+  const loadPayments = async () => {
+    if (!developer?.api_key) return
+
+    try {
+      const response = await fetch('/api/developer/payments', {
+        headers: {
+          'Authorization': `Bearer ${developer.api_key}`
+        }
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setPayments(data.payments || [])
+        setPaymentStats(data.stats || {})
+      }
+    } catch (error) {
+      console.error('Error loading payments:', error)
     }
   }
 
@@ -201,6 +236,8 @@ function openStellexPay(apiKey, amount, description) {
           {[
             { id: 'overview', label: 'Обзор', icon: BarChart3 },
             { id: 'payments', label: 'Платежи', icon: CreditCard },
+            { id: 'button-generator', label: 'Генератор кнопок', icon: Zap },
+            { id: 'sandbox', label: 'Песочница', icon: Play },
             { id: 'settings', label: 'Настройки', icon: Settings },
             { id: 'docs', label: 'Документация', icon: Code }
           ].map((tab) => {
@@ -318,6 +355,161 @@ function openStellexPay(apiKey, amount, description) {
           </div>
         )}
 
+        {activeTab === 'button-generator' && (
+          <div className="space-y-6">
+            <div className="text-center">
+              <h3 className="text-white font-bold text-xl mb-2">Генератор кнопок Stellex Pay</h3>
+              <p className="text-white/70">Создайте и настройте кнопки оплаты для вашего сайта</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6">
+                <h4 className="text-white font-semibold mb-4 flex items-center gap-2">
+                  <Zap className="w-5 h-5" />
+                  Быстрый старт
+                </h4>
+                <div className="space-y-3">
+                  <button
+                    onClick={() => setShowButtonGenerator(true)}
+                    className="w-full p-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-300 flex items-center justify-center space-x-2"
+                  >
+                    <Zap className="w-5 h-5" />
+                    <span>Создать кнопку</span>
+                  </button>
+                  <p className="text-white/70 text-sm text-center">
+                    Настройте внешний вид и получите готовый код
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6">
+                <h4 className="text-white font-semibold mb-4 flex items-center gap-2">
+                  <BarChart3 className="w-5 h-5" />
+                  Статистика платежей
+                </h4>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-white/70">Всего платежей:</span>
+                    <span className="text-white font-semibold">{paymentStats.total_payments}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-white/70">Завершено:</span>
+                    <span className="text-green-400 font-semibold">{paymentStats.completed_payments}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-white/70">Общая сумма:</span>
+                    <span className="text-white font-semibold">{paymentStats.total_amount} STARS</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-white/70">Успешность:</span>
+                    <span className="text-blue-400 font-semibold">{paymentStats.success_rate}%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6">
+              <h4 className="text-white font-semibold mb-4">Последние платежи</h4>
+              {payments.length === 0 ? (
+                <div className="text-center py-8">
+                  <CreditCard className="w-16 h-16 text-white/30 mx-auto mb-4" />
+                  <p className="text-white/70">Платежей пока нет</p>
+                  <p className="text-white/50 text-sm mt-2">Создайте кнопку и начните принимать платежи</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {payments.slice(0, 5).map((payment: any) => (
+                    <div key={payment.id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                      <div>
+                        <p className="text-white font-medium">{payment.description}</p>
+                        <p className="text-white/70 text-sm">{payment.amount} STARS</p>
+                      </div>
+                      <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        payment.status === 'completed' ? 'bg-green-500/20 text-green-400' :
+                        payment.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' :
+                        'bg-red-500/20 text-red-400'
+                      }`}>
+                        {payment.status === 'completed' ? 'Завершен' :
+                         payment.status === 'pending' ? 'Ожидает' : 'Отклонен'}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'sandbox' && (
+          <div className="space-y-6">
+            <div className="text-center">
+              <h3 className="text-white font-bold text-xl mb-2">Песочница для тестирования API</h3>
+              <p className="text-white/70">Тестируйте API запросы прямо в браузере</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6">
+                <h4 className="text-white font-semibold mb-4 flex items-center gap-2">
+                  <Play className="w-5 h-5" />
+                  Быстрые тесты
+                </h4>
+                <div className="space-y-3">
+                  <button
+                    onClick={() => setShowSandbox(true)}
+                    className="w-full p-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all duration-300 flex items-center justify-center space-x-2"
+                  >
+                    <Play className="w-5 h-5" />
+                    <span>Открыть песочницу</span>
+                  </button>
+                  <p className="text-white/70 text-sm text-center">
+                    Тестируйте API запросы с вашим ключом
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6">
+                <h4 className="text-white font-semibold mb-4 flex items-center gap-2">
+                  <Code className="w-5 h-5" />
+                  Документация
+                </h4>
+                <div className="space-y-3">
+                  <button
+                    onClick={() => setShowDocs(true)}
+                    className="w-full p-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl hover:from-blue-700 hover:to-cyan-700 transition-all duration-300 flex items-center justify-center space-x-2"
+                  >
+                    <Code className="w-5 h-5" />
+                    <span>Открыть документацию</span>
+                  </button>
+                  <p className="text-white/70 text-sm text-center">
+                    Полное руководство по API
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6">
+              <h4 className="text-white font-semibold mb-4">Примеры использования</h4>
+              <div className="space-y-4">
+                <div className="bg-black/20 rounded-lg p-4">
+                  <h5 className="text-white font-medium mb-2">Создание платежа</h5>
+                  <code className="text-green-400 text-sm block">
+                    POST /api/developer/payment<br/>
+                    Authorization: Bearer {developer?.api_key?.slice(0, 20)}...<br/>
+                    {JSON.stringify({ amount: 100, description: "Тестовый платеж" }, null, 2)}
+                  </code>
+                </div>
+                <div className="bg-black/20 rounded-lg p-4">
+                  <h5 className="text-white font-medium mb-2">Получение статистики</h5>
+                  <code className="text-blue-400 text-sm block">
+                    GET /api/developer/payments<br/>
+                    Authorization: Bearer {developer?.api_key?.slice(0, 20)}...
+                  </code>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {activeTab === 'settings' && (
           <div className="space-y-6">
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6">
@@ -398,6 +590,30 @@ function openStellexPay(apiKey, amount, description) {
           </div>
         )}
       </div>
+
+      {/* Button Generator Modal */}
+      {showButtonGenerator && developer?.api_key && (
+        <ButtonGenerator
+          apiKey={developer.api_key}
+          onClose={() => setShowButtonGenerator(false)}
+        />
+      )}
+
+      {/* Sandbox Modal */}
+      {showSandbox && developer?.api_key && (
+        <DeveloperSandbox
+          apiKey={developer.api_key}
+          onClose={() => setShowSandbox(false)}
+        />
+      )}
+
+      {/* Docs Modal */}
+      {showDocs && developer?.api_key && (
+        <DeveloperDocs
+          apiKey={developer.api_key}
+          onClose={() => setShowDocs(false)}
+        />
+      )}
     </div>
   )
 }

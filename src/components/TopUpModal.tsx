@@ -27,11 +27,20 @@ export default function TopUpModal({ card, onClose, onTopUp }: TopUpModalProps) 
     setIsLoading(true)
     
     try {
-      await onTopUp({
-        cardId: card.id,
-        amount: parseFloat(amount),
-        paymentMethod
-      })
+      if (paymentMethod === 'telegram') {
+        // Для Telegram Stars передаем starsAmount
+        await onTopUp({
+          cardId: card.id,
+          starsAmount: parseFloat(amount)
+        })
+      } else {
+        // Для банковской карты передаем amount
+        await onTopUp({
+          cardId: card.id,
+          amount: parseFloat(amount),
+          paymentMethod
+        })
+      }
       onClose()
     } catch (error) {
       console.error('Top up error:', error)
