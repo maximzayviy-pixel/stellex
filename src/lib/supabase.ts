@@ -59,28 +59,37 @@ function getSupabaseAdminClient() {
   return supabaseAdminClient
 }
 
-// Экспортируем функции вместо готовых клиентов
+// Экспортируем функции для создания клиентов
 export const getSupabase = getSupabaseClient
 export const getSupabaseAdmin = getSupabaseAdminClient
 
-// Для обратной совместимости создаем клиентов только когда они нужны
+// Создаем клиентов только при первом обращении
 let _supabase: ReturnType<typeof createClient> | null = null
 let _supabaseAdmin: ReturnType<typeof createClient> | null = null
 
+export function getSupabaseClientInstance() {
+  if (!_supabase) {
+    _supabase = getSupabaseClient()
+  }
+  return _supabase
+}
+
+export function getSupabaseAdminClientInstance() {
+  if (!_supabaseAdmin) {
+    _supabaseAdmin = getSupabaseAdminClient()
+  }
+  return _supabaseAdmin
+}
+
+// Для обратной совместимости
 export const supabase = {
   get value() {
-    if (!_supabase) {
-      _supabase = getSupabaseClient()
-    }
-    return _supabase
+    return getSupabaseClientInstance()
   }
 }
 
 export const supabaseAdmin = {
   get value() {
-    if (!_supabaseAdmin) {
-      _supabaseAdmin = getSupabaseAdminClient()
-    }
-    return _supabaseAdmin
+    return getSupabaseAdminClientInstance()
   }
 }

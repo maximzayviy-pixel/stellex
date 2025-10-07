@@ -4,6 +4,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react'
 import { User } from '@/types'
 import { getTelegramWebAppData, isTelegramWebApp } from '@/lib/telegramUtils'
 import LoadingError from './LoadingError'
+import LoginScreen from './LoginScreen'
 
 interface AuthContextType {
   user: User | null
@@ -19,6 +20,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [showLoginScreen, setShowLoginScreen] = useState(false)
 
   useEffect(() => {
     const initializeAuth = async () => {
@@ -46,7 +48,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               setLoading(false)
             }
           } else {
-            console.log('Not in Telegram Web App, stopping loading')
+            console.log('Not in Telegram Web App, showing login screen')
+            setShowLoginScreen(true)
             setLoading(false)
           }
         }
@@ -60,11 +63,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Добавляем таймаут для предотвращения бесконечной загрузки
     const timeoutId = setTimeout(() => {
       if (loading) {
-        console.warn('Auth initialization timeout, stopping loading')
-        setError('Таймаут загрузки. Проверьте подключение к интернету.')
+        console.warn('Auth initialization timeout, showing login screen')
+        setShowLoginScreen(true)
         setLoading(false)
       }
-    }, 30000) // 30 секунд таймаут
+    }, 10000) // 10 секунд таймаут
 
     initializeAuth()
 
@@ -142,16 +145,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const retryAuth = () => {
     setError(null)
+    setShowLoginScreen(false)
     setLoading(true)
     // Повторяем инициализацию
     const token = localStorage.getItem('auth_token')
     if (token) {
       validateToken(token)
     } else {
-      const tgUser = getTelegramWebAppData()
-      if (tgUser) {
-        authenticateWithTelegram(tgUser)
+      if (isTelegramWebApp()) {
+        const tgUser = getTelegramWebAppData()
+        if (tgUser) {
+          authenticateWithTelegram(tgUser)
+        } else {
+          setLoading(false)
+        }
       } else {
+        setShowLoginScreen(true)
         setLoading(false)
       }
     }
@@ -160,6 +169,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Показываем ошибку, если она есть
   if (error) {
     return <LoadingError message={error} onRetry={retryAuth} />
+  }
+
+  // Показываем экран входа, если не в Telegram Web App
+  if (showLoginScreen) {
+    return <LoginScreen onRetry={retryAuth} />
   }
 
   return (
