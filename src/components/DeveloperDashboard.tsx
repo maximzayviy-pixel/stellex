@@ -15,7 +15,8 @@ import {
   ExternalLink,
   Webhook,
   DollarSign,
-  Play
+  Play,
+  Zap
 } from 'lucide-react'
 import { Developer, PaymentRequest } from '@/types'
 import { useAuth } from './AuthProvider'
