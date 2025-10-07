@@ -34,7 +34,7 @@ export default function BottomNavigation({ activeTab, onTabChange }: BottomNavig
   ]
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-gray-900/95 backdrop-blur-xl border-t border-white/20 px-4 py-3 z-50">
+    <div className="fixed bottom-0 left-0 right-0 bg-gray-900/95 backdrop-blur-xl border-t border-white/20 px-2 py-2 z-50">
       <div className="flex items-center justify-around max-w-md mx-auto">
         {tabs.map((tab) => {
           const Icon = tab.icon
@@ -44,7 +44,7 @@ export default function BottomNavigation({ activeTab, onTabChange }: BottomNavig
             <motion.button
               key={tab.id}
               onClick={() => onTabChange(tab.id)}
-              className={`flex flex-col items-center space-y-1 py-2 px-3 rounded-xl transition-colors ${
+                    className={`flex flex-col items-center space-y-1 py-1 px-2 rounded-xl transition-colors ${
                 isActive 
                   ? 'text-purple-400 bg-purple-500/20' 
                   : 'text-white/70 hover:text-white hover:bg-white/10'
@@ -52,7 +52,7 @@ export default function BottomNavigation({ activeTab, onTabChange }: BottomNavig
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <Icon className={`w-5 h-5 ${isActive ? 'text-purple-400' : 'text-white/70'}`} />
+              <Icon className={`w-4 h-4 ${isActive ? 'text-purple-400' : 'text-white/70'}`} />
               <span className={`text-xs font-medium ${isActive ? 'text-purple-400' : 'text-white/70'}`}>
                 {tab.label}
               </span>

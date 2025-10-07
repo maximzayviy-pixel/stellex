@@ -31,8 +31,8 @@ import DeveloperDashboard from './DeveloperDashboard'
 import SupportDashboard from './SupportDashboard'
 import AdminDashboard from './AdminDashboard'
 import TelegramDebug from './TelegramDebug'
-import TransactionHistory from './TransactionHistory'
-import SettingsModal from './SettingsModal'
+import TransactionHistoryPage from './TransactionHistoryPage'
+import SettingsPage from './SettingsPage'
 import UserTicketsModal from './UserTicketsModal'
 
 export default function BankingApp() {
@@ -333,7 +333,7 @@ export default function BankingApp() {
       </div>
 
       {/* Main Content */}
-      <div className="px-4 pb-32 overflow-y-auto">
+      <div className="px-4 pb-20 overflow-y-auto min-h-screen">
         {activeTab === 'cards' && (
           <>
             <h3 className="text-white font-bold text-lg mb-4">Мои карты</h3>
@@ -366,7 +366,7 @@ export default function BankingApp() {
         )}
 
         {activeTab === 'history' && (
-          <TransactionHistory onClose={() => {}} />
+          <TransactionHistoryPage onBack={() => setActiveTab('cards')} />
         )}
 
         {activeTab === 'support' && (
@@ -396,7 +396,7 @@ export default function BankingApp() {
         )}
 
         {activeTab === 'settings' && (
-          <SettingsModal user={user} onClose={() => {}} onUpdateUser={(updates) => {
+          <SettingsPage user={user} onBack={() => setActiveTab('cards')} onUpdateUser={(updates) => {
             console.log('User updated:', updates)
           }} />
         )}
