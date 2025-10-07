@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { User } from '@/types'
 import { getTelegramWebAppData } from '@/lib/telegramUtils'
+import LoadingError from './LoadingError'
 
 interface AuthContextType {
   user: User | null
@@ -17,23 +18,45 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    // Проверяем токен в localStorage
-    const token = localStorage.getItem('auth_token')
-    if (token) {
-      // Валидируем токен и загружаем пользователя
-      validateToken(token)
-    } else {
-      // Пытаемся получить данные из Telegram Web App
-      const tgUser = getTelegramWebAppData()
-      if (tgUser) {
-        // Авторизуемся через Telegram
-        authenticateWithTelegram(tgUser)
-      } else {
+    const initializeAuth = async () => {
+      try {
+        // Проверяем токен в localStorage
+        const token = localStorage.getItem('auth_token')
+        if (token) {
+          // Валидируем токен и загружаем пользователя
+          await validateToken(token)
+        } else {
+          // Пытаемся получить данные из Telegram Web App
+          const tgUser = getTelegramWebAppData()
+          if (tgUser) {
+            // Авторизуемся через Telegram
+            await authenticateWithTelegram(tgUser)
+          } else {
+            setLoading(false)
+          }
+        }
+      } catch (error) {
+        console.error('Auth initialization error:', error)
+        setError('Ошибка инициализации аутентификации')
         setLoading(false)
       }
     }
+
+    // Добавляем таймаут для предотвращения бесконечной загрузки
+    const timeoutId = setTimeout(() => {
+      if (loading) {
+        console.warn('Auth initialization timeout, stopping loading')
+        setError('Таймаут загрузки. Проверьте подключение к интернету.')
+        setLoading(false)
+      }
+    }, 10000) // 10 секунд таймаут
+
+    initializeAuth()
+
+    return () => clearTimeout(timeoutId)
   }, [])
 
   const validateToken = async (token: string) => {
@@ -47,12 +70,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (response.ok) {
         const userData = await response.json()
         setUser(userData.user)
+        setError(null)
       } else {
         localStorage.removeItem('auth_token')
+        setError('Сессия истекла. Войдите снова.')
       }
     } catch (error) {
       console.error('Token validation error:', error)
       localStorage.removeItem('auth_token')
+      setError('Ошибка проверки токена')
     } finally {
       setLoading(false)
     }
@@ -73,10 +99,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (data.success) {
           setUser(data.user)
           localStorage.setItem('auth_token', data.token)
+          setError(null)
+        } else {
+          setError('Ошибка авторизации через Telegram')
         }
+      } else {
+        setError('Ошибка подключения к серверу')
       }
     } catch (error) {
       console.error('Telegram auth error:', error)
+      setError('Ошибка авторизации через Telegram')
     } finally {
       setLoading(false)
     }
@@ -94,6 +126,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const updateUser = (updatedUser: User) => {
     setUser(updatedUser)
+  }
+
+  const retryAuth = () => {
+    setError(null)
+    setLoading(true)
+    // Повторяем инициализацию
+    const token = localStorage.getItem('auth_token')
+    if (token) {
+      validateToken(token)
+    } else {
+      const tgUser = getTelegramWebAppData()
+      if (tgUser) {
+        authenticateWithTelegram(tgUser)
+      } else {
+        setLoading(false)
+      }
+    }
+  }
+
+  // Показываем ошибку, если она есть
+  if (error) {
+    return <LoadingError message={error} onRetry={retryAuth} />
   }
 
   return (

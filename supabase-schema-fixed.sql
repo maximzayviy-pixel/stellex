@@ -160,29 +160,29 @@ ALTER TABLE developers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payment_requests ENABLE ROW LEVEL SECURITY;
 ALTER TABLE support_tickets ENABLE ROW LEVEL SECURITY;
 
--- Политики RLS для пользователей
+-- Политики RLS для пользователей (исправленные)
 CREATE POLICY "Users can view own data" ON users FOR SELECT USING (auth.uid() = id);
 CREATE POLICY "Users can update own data" ON users FOR UPDATE USING (auth.uid() = id);
 
--- Политики RLS для карт
+-- Политики RLS для карт (исправленные)
 CREATE POLICY "Users can view own cards" ON cards FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "Users can insert own cards" ON cards FOR INSERT WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "Users can update own cards" ON cards FOR UPDATE USING (auth.uid() = user_id);
 
--- Политики RLS для транзакций
+-- Политики RLS для транзакций (исправленные)
 CREATE POLICY "Users can view own transactions" ON transactions FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "Users can insert own transactions" ON transactions FOR INSERT WITH CHECK (auth.uid() = user_id);
 
--- Политики RLS для разработчиков
+-- Политики RLS для разработчиков (исправленные)
 CREATE POLICY "Developers can view own data" ON developers FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "Developers can update own data" ON developers FOR UPDATE USING (auth.uid() = user_id);
 
--- Политики RLS для платежных запросов
+-- Политики RLS для платежных запросов (исправленные)
 CREATE POLICY "Developers can view own payment requests" ON payment_requests FOR SELECT USING (
   EXISTS (SELECT 1 FROM developers WHERE id = developer_id AND user_id = auth.uid())
 );
 
--- Политики RLS для тикетов поддержки
+-- Политики RLS для тикетов поддержки (исправленные)
 CREATE POLICY "Users can view own tickets" ON support_tickets FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "Users can create tickets" ON support_tickets FOR INSERT WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "Support can view all tickets" ON support_tickets FOR SELECT USING (
@@ -190,4 +190,41 @@ CREATE POLICY "Support can view all tickets" ON support_tickets FOR SELECT USING
 );
 CREATE POLICY "Support can update tickets" ON support_tickets FOR UPDATE USING (
   EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role IN ('support', 'admin'))
+);
+
+-- Дополнительные политики для администраторов
+CREATE POLICY "Admins can view all users" ON users FOR SELECT USING (
+  EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role = 'admin')
+);
+CREATE POLICY "Admins can update all users" ON users FOR UPDATE USING (
+  EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role = 'admin')
+);
+
+CREATE POLICY "Admins can view all cards" ON cards FOR SELECT USING (
+  EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role = 'admin')
+);
+CREATE POLICY "Admins can update all cards" ON cards FOR UPDATE USING (
+  EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role = 'admin')
+);
+
+CREATE POLICY "Admins can view all transactions" ON transactions FOR SELECT USING (
+  EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role = 'admin')
+);
+
+CREATE POLICY "Admins can view all developers" ON developers FOR SELECT USING (
+  EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role = 'admin')
+);
+CREATE POLICY "Admins can update all developers" ON developers FOR UPDATE USING (
+  EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role = 'admin')
+);
+
+CREATE POLICY "Admins can view all payment requests" ON payment_requests FOR SELECT USING (
+  EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role = 'admin')
+);
+
+CREATE POLICY "Admins can view all support tickets" ON support_tickets FOR SELECT USING (
+  EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role = 'admin')
+);
+CREATE POLICY "Admins can update all support tickets" ON support_tickets FOR UPDATE USING (
+  EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role = 'admin')
 );

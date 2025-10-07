@@ -38,7 +38,7 @@ export async function authenticateUser(telegramId: number, userData: { first_nam
           language_code: userData.language_code,
           is_premium: userData.is_premium,
           updated_at: new Date().toISOString()
-        })
+        } as any)
         .eq('id', existingUser.id)
         .select()
         .single()

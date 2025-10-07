@@ -23,7 +23,7 @@ import CardDetailsModal from './CardDetailsModal'
 import QRCodeModal from './QRCodeModal'
 import BottomNavigation from './BottomNavigation'
 import { Card, TopUpData, User } from '@/types'
-import { supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase'
 import { useAuth } from './AuthProvider'
 import DeveloperDashboard from './DeveloperDashboard'
 import SupportDashboard from './SupportDashboard'
@@ -55,7 +55,7 @@ export default function BankingApp() {
       setIsLoading(true)
       
       // Загружаем карты пользователя
-      const { data: cardsData, error: cardsError } = await supabase
+      const { data: cardsData, error: cardsError } = await supabaseAdmin
         .from('cards')
         .select('*')
         .eq('user_id', user.id)
