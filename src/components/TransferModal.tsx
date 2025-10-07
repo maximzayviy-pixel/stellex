@@ -49,8 +49,9 @@ export default function TransferModal({ cards, onClose, onTransfer, showNotifica
     }
 
     // Валидация номера карты (должен начинаться с 666)
-    if (!toCardNumber.startsWith('666') || toCardNumber.length !== 16) {
-      showNotification('Неверный формат номера карты')
+    const cleanCardNumber = toCardNumber.replace(/\s/g, '')
+    if (!cleanCardNumber.startsWith('666') || cleanCardNumber.length !== 16) {
+      showNotification('Неверный формат номера карты. Карта должна начинаться с 666 и содержать 16 цифр')
       return
     }
 
@@ -59,7 +60,7 @@ export default function TransferModal({ cards, onClose, onTransfer, showNotifica
     try {
       await onTransfer({
         fromCardId,
-        toCardNumber,
+        toCardNumber: cleanCardNumber,
         amount: parseFloat(amount),
         description: description || 'Перевод между картами'
       })

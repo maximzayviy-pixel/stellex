@@ -11,7 +11,8 @@ import {
   Loader,
   Send,
   Zap,
-  Eye
+  Eye,
+  X
 } from 'lucide-react'
 
 interface SandboxProps {
@@ -133,9 +134,9 @@ export default function DeveloperSandbox({ apiKey, onClose }: SandboxProps) {
           <h2 className="text-2xl font-bold text-gray-900">Песочница для тестирования API</h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600 hover:text-gray-800"
           >
-            ✕
+            <X className="w-5 h-5" />
           </button>
         </div>
 
@@ -355,7 +356,7 @@ export default function DeveloperSandbox({ apiKey, onClose }: SandboxProps) {
                   <div className="font-medium text-gray-900 mb-2">Создание платежа</div>
                   <code className="text-sm text-gray-700 block">
                     POST /api/developer/payment<br/>
-                    Authorization: Bearer {apiKey.slice(0, 20)}...<br/>
+                    Authorization: Bearer {apiKey}<br/>
                     {JSON.stringify({ amount: 100, description: "Тестовый платеж" }, null, 2)}
                   </code>
                 </div>
@@ -363,7 +364,7 @@ export default function DeveloperSandbox({ apiKey, onClose }: SandboxProps) {
                   <div className="font-medium text-gray-900 mb-2">Получение платежей</div>
                   <code className="text-sm text-gray-700 block">
                     GET /api/developer/payments<br/>
-                    Authorization: Bearer {apiKey.slice(0, 20)}...
+                    Authorization: Bearer {apiKey}
                   </code>
                 </div>
               </div>

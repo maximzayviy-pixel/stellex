@@ -13,7 +13,8 @@ import {
   Zap,
   CreditCard,
   BarChart3,
-  Settings
+  Settings,
+  X
 } from 'lucide-react'
 
 interface DeveloperDocsProps {
@@ -342,20 +343,20 @@ export default function DeveloperDocs({ apiKey, onClose }: DeveloperDocsProps) {
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <h3 className="font-semibold text-red-900 mb-2">4xx - Ошибки клиента</h3>
           <div className="space-y-2 text-sm">
-            <div><code className="bg-red-100 px-2 py-1 rounded">400</code> - Неверные параметры запроса</div>
-            <div><code className="bg-red-100 px-2 py-1 rounded">401</code> - Неверный или отсутствующий API ключ</div>
-            <div><code className="bg-red-100 px-2 py-1 rounded">403</code> - Доступ запрещен</div>
-            <div><code className="bg-red-100 px-2 py-1 rounded">404</code> - Ресурс не найден</div>
-            <div><code className="bg-red-100 px-2 py-1 rounded">429</code> - Превышен лимит запросов</div>
+            <div><code className="bg-red-100 px-2 py-1 rounded text-red-800">400</code> <span className="text-red-800">- Неверные параметры запроса</span></div>
+            <div><code className="bg-red-100 px-2 py-1 rounded text-red-800">401</code> <span className="text-red-800">- Неверный или отсутствующий API ключ</span></div>
+            <div><code className="bg-red-100 px-2 py-1 rounded text-red-800">403</code> <span className="text-red-800">- Доступ запрещен</span></div>
+            <div><code className="bg-red-100 px-2 py-1 rounded text-red-800">404</code> <span className="text-red-800">- Ресурс не найден</span></div>
+            <div><code className="bg-red-100 px-2 py-1 rounded text-red-800">429</code> <span className="text-red-800">- Превышен лимит запросов</span></div>
           </div>
         </div>
 
         <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
           <h3 className="font-semibold text-orange-900 mb-2">5xx - Ошибки сервера</h3>
           <div className="space-y-2 text-sm">
-            <div><code className="bg-orange-100 px-2 py-1 rounded">500</code> - Внутренняя ошибка сервера</div>
-            <div><code className="bg-orange-100 px-2 py-1 rounded">502</code> - Ошибка шлюза</div>
-            <div><code className="bg-orange-100 px-2 py-1 rounded">503</code> - Сервис недоступен</div>
+            <div><code className="bg-orange-100 px-2 py-1 rounded text-orange-800">500</code> <span className="text-orange-800">- Внутренняя ошибка сервера</span></div>
+            <div><code className="bg-orange-100 px-2 py-1 rounded text-orange-800">502</code> <span className="text-orange-800">- Ошибка шлюза</span></div>
+            <div><code className="bg-orange-100 px-2 py-1 rounded text-orange-800">503</code> <span className="text-orange-800">- Сервис недоступен</span></div>
           </div>
         </div>
       </div>
@@ -503,12 +504,12 @@ payment, err := client.Payments.Create(&stellex.PaymentRequest{
         <div className="w-64 bg-gray-50 border-r border-gray-200 p-6 overflow-y-auto">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-gray-900">API Документация</h2>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
-            >
-              ✕
-            </button>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-gray-200 rounded-lg transition-colors text-gray-600 hover:text-gray-800"
+          >
+            <X className="w-5 h-5" />
+          </button>
           </div>
           
           <nav className="space-y-2">

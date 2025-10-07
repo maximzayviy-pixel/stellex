@@ -10,7 +10,8 @@ import {
   Palette, 
   Settings,
   Zap,
-  ExternalLink
+  ExternalLink,
+  X
 } from 'lucide-react'
 
 interface ButtonStyle {
@@ -245,9 +246,9 @@ export default StellexPayButton;`
           <h2 className="text-2xl font-bold text-gray-900">Генератор кнопки Stellex Pay</h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600 hover:text-gray-800"
           >
-            ✕
+            <X className="w-5 h-5" />
           </button>
         </div>
 
