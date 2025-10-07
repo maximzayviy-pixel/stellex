@@ -85,6 +85,7 @@ export default function BankingApp() {
 
       if (response.ok) {
         const data = await response.json()
+        console.log('Loaded cards:', data.cards)
         setCards(data.cards || [])
       } else {
         console.error('Error loading cards:', await response.text())
@@ -259,6 +260,7 @@ export default function BankingApp() {
           onTransfer={() => setShowTransferModal(true)}
           onQRCode={() => setShowQRCodeModal(true)}
           onScan={() => setShowQRCodeModal(true)}
+          onCardClick={handleCardExpand}
           showNotification={showNotification}
         />
       )}

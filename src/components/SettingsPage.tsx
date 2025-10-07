@@ -35,8 +35,7 @@ export default function SettingsPage({ user, onBack, onUpdateUser }: SettingsPag
   const [profileData, setProfileData] = useState({
     first_name: user.first_name || '',
     last_name: user.last_name || '',
-    email: user.email || '',
-    phone: user.phone || ''
+    email: user.email || ''
   })
 
   // Security settings
@@ -74,8 +73,7 @@ export default function SettingsPage({ user, onBack, onUpdateUser }: SettingsPag
         body: JSON.stringify({
           first_name: profileData.first_name,
           last_name: profileData.last_name,
-          email: profileData.email,
-          phone: profileData.phone
+          email: profileData.email
         })
       })
 
@@ -266,18 +264,6 @@ export default function SettingsPage({ user, onBack, onUpdateUser }: SettingsPag
                       />
                     </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-white/70 mb-2">
-                        Телефон
-                      </label>
-                      <input
-                        type="tel"
-                        value={profileData.phone}
-                        onChange={(e) => setProfileData(prev => ({ ...prev, phone: e.target.value }))}
-                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                        placeholder="Введите номер телефона"
-                      />
-                    </div>
 
 
                     <div>
