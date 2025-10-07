@@ -332,7 +332,7 @@ export default function BankingApp() {
       </div>
 
       {/* Main Content */}
-      <div className="px-4 mb-6">
+      <div className="px-4 pb-32 overflow-y-auto">
         {activeTab === 'cards' && (
           <>
             <h3 className="text-white font-bold text-lg mb-4">Мои карты</h3>

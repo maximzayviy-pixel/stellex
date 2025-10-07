@@ -38,7 +38,7 @@ interface UserWithStats extends User {
   transactions_count: number
 }
 
-export default function AdminDashboardNew() {
+export default function AdminDashboard() {
   const { user } = useAuth()
   const [stats, setStats] = useState<AdminStats>({
     totalUsers: 0,
@@ -248,9 +248,9 @@ export default function AdminDashboardNew() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 overflow-y-auto">
       {/* Header */}
-      <div className="p-4 pt-12">
+      <div className="p-4 pt-12 pb-32">
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-white">Админ панель</h1>

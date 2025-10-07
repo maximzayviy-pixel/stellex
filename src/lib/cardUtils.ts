@@ -1,4 +1,5 @@
 import { Card, CardCreationData } from '@/types'
+import { v4 as uuidv4 } from 'uuid'
 
 export function generateCardNumber(): string {
   // Генерируем номер карты с префиксом 666
@@ -48,7 +49,7 @@ export function createCard(userId: string, holderName: string): Card {
 }
 
 export function generateId(): string {
-  return Math.random().toString(36).substr(2, 9) + Date.now().toString(36)
+  return uuidv4()
 }
 
 export function validateCardNumber(cardNumber: string): boolean {

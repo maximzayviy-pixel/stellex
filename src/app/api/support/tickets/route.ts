@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
       .from('support_tickets')
       .select(`
         *,
-        user:users(first_name, last_name, email, telegram_id)
+        user:users!support_tickets_user_id_fkey(first_name, last_name, email, telegram_id)
       `)
 
     // Если пользователь не админ/саппорт, показываем только его заявки
@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
       })
       .select(`
         *,
-        user:users(first_name, last_name, email, telegram_id)
+        user:users!support_tickets_user_id_fkey(first_name, last_name, email, telegram_id)
       `)
       .single()
 
@@ -154,7 +154,7 @@ export async function PUT(request: NextRequest) {
       .eq('id', ticketId)
       .select(`
         *,
-        user:users(first_name, last_name, email, telegram_id)
+        user:users!support_tickets_user_id_fkey(first_name, last_name, email, telegram_id)
       `)
       .single()
 

@@ -147,7 +147,7 @@ export default function TransactionHistory({ onClose }: TransactionHistoryProps)
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
-        className="bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 w-full max-w-4xl max-h-[90vh] overflow-hidden"
+        className="bg-gray-900/95 backdrop-blur-xl rounded-2xl border border-white/30 w-full max-w-4xl max-h-[95vh] overflow-hidden shadow-2xl mx-2"
       >
         {/* Header */}
         <div className="p-6 border-b border-white/10">
