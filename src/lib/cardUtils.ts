@@ -41,7 +41,7 @@ export function createCard(userId: string, holderName: string): Card {
     expiry_date: generateExpiryDate(),
     cvv: generateCVV(),
     balance: 0,
-    status: 'pending',
+    status: 'active',
     created_at: now,
     updated_at: now
   }

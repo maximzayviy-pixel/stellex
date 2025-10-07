@@ -1,18 +1,19 @@
 'use client'
 
-import React, { useMemo, useRef, useState } from 'react'
-import { motion, useMotionTemplate, useMotionValue } from 'framer-motion'
-import {
-  Smartphone,
-  CreditCard,
-  Zap,
-  Shield,
-  Code,
-  BarChart3,
-  Users,
+import React, { useState } from 'react'
+import { motion } from 'framer-motion'
+import { 
+  Smartphone, 
+  CreditCard, 
+  Zap, 
+  Shield, 
+  Code, 
+  BarChart3, 
+  Users, 
   Star,
   ArrowRight,
-  Calendar,
+  CheckCircle,
+  Calendar
 } from 'lucide-react'
 
 interface LandingPageProps {
@@ -20,196 +21,263 @@ interface LandingPageProps {
   onRegister: () => void
 }
 
-function ShineText({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="relative inline-block text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-300 via-white to-sky-300 [background-size:200%_100%] animate-[shimmer_5s_linear_infinite]">
-      {children}
-    </span>
-  )
-}
-
-function TiltCard({ children }: { children: React.ReactNode }) {
-  const ref = useRef<HTMLDivElement | null>(null)
-  const x = useMotionValue(0)
-  const y = useMotionValue(0)
-
-  const rotateX = useMotionTemplate`${y}deg`
-  const rotateY = useMotionTemplate`${x}deg`
-
-  const handleMouseMove: React.MouseEventHandler<HTMLDivElement> = (e) => {
-    const el = ref.current
-    if (!el) return
-    const rect = el.getBoundingClientRect()
-    const px = (e.clientX - rect.left) / rect.width
-    const py = (e.clientY - rect.top) / rect.height
-    const max = 5
-    x.set((0.5 - px) * max)
-    y.set((py - 0.5) * max)
-  }
-
-  return (
-    <motion.div
-      ref={ref}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={() => { x.set(0); y.set(0) }}
-      style={{ perspective: 1000, transformStyle: 'preserve-3d' }}
-      className="rounded-3xl overflow-hidden shadow-[0_0_30px_rgba(0,0,0,0.4)] bg-gradient-to-br from-white/10 to-white/5 border border-white/10 backdrop-blur-xl"
-    >
-      <motion.div style={{ rotateX, rotateY }} className="p-8 flex flex-col justify-between h-full">
-        {children}
-      </motion.div>
-    </motion.div>
-  )
-}
-
 export default function LandingPage({ onLogin, onRegister }: LandingPageProps) {
   const [activeTab, setActiveTab] = useState<'users' | 'developers'>('users')
 
-  const features = useMemo(
-    () => ({
-      users: [
-        {
-          icon: CreditCard,
-          title: 'Виртуальные и физические карты',
-          description: 'Выпускайте до 3 виртуальных и пластиковую — оплачивайте везде.',
-          gradient: 'from-fuchsia-500 to-sky-500',
-        },
-        {
-          icon: Zap,
-          title: 'Мгновенные переводы',
-          description: 'Перевод по номеру карты и QR — за секунды, без скрытых комиссий.',
-          gradient: 'from-violet-500 to-indigo-500',
-        },
-        {
-          icon: Shield,
-          title: 'Банковская безопасность',
-          description: 'Шифрование, лимиты, подтверждения — контроль в одном тапе.',
-          gradient: 'from-sky-500 to-cyan-500',
-        },
-      ],
-      developers: [
-        { icon: Code, title: 'REST API', description: 'Простой API для интеграции платежей', gradient: 'from-sky-500 to-fuchsia-500' },
-        { icon: BarChart3, title: 'Аналитика', description: 'Дашборды с метриками и ретеншеном', gradient: 'from-indigo-500 to-violet-500' },
-        { icon: Users, title: 'Webhook уведомления', description: 'Онлайн-события по всем статусам', gradient: 'from-fuchsia-500 to-cyan-500' },
-        { icon: Star, title: 'Готовые виджеты', description: 'Кнопки PAY WITH STELLEX и примеры', gradient: 'from-sky-500 to-indigo-500' },
-      ],
-    }),
-    []
-  )
+  const features = {
+    users: [
+      {
+        icon: CreditCard,
+        title: 'Виртуальные карты',
+        description: 'Создавайте до 3 виртуальных карт с балансом в Telegram Stars'
+      },
+      {
+        icon: Zap,
+        title: 'Мгновенные переводы',
+        description: 'Переводите деньги между пользователями по номеру карты'
+      },
+      {
+        icon: Smartphone,
+        title: 'QR-платежи',
+        description: 'Генерируйте и сканируйте QR-коды для быстрых платежей'
+      },
+      {
+        icon: Shield,
+        title: 'Безопасность',
+        description: 'Все транзакции защищены современными методами шифрования'
+      }
+    ],
+    developers: [
+      {
+        icon: Code,
+        title: 'REST API',
+        description: 'Простой и мощный API для интеграции платежей в ваши приложения'
+      },
+      {
+        icon: BarChart3,
+        title: 'Аналитика',
+        description: 'Детальная статистика платежей и пользователей'
+      },
+      {
+        icon: Users,
+        title: 'Webhook уведомления',
+        description: 'Получайте уведомления о статусе платежей в реальном времени'
+      },
+      {
+        icon: Star,
+        title: 'Готовые решения',
+        description: 'Кнопки "PAY WITH STELLEX" и виджеты для быстрой интеграции'
+      }
+    ]
+  }
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#0b0b12] text-white">
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
       {/* Header */}
-      <header className="relative z-10">
-        <div className="container mx-auto px-6 py-8 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="h-11 w-11 rounded-xl bg-gradient-to-br from-fuchsia-500 to-sky-500 flex items-center justify-center shadow-lg shadow-fuchsia-500/30">
-              <Smartphone className="h-6 w-6" />
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex justify-between items-center mb-12">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg flex items-center justify-center">
+              <Smartphone className="w-6 h-6 text-white" />
             </div>
             <div>
-              <div className="text-xl font-semibold tracking-tight">Stellex Pay</div>
-              <div className="text-white/60 text-xs">Банк со звездами Telegram</div>
+              <h1 className="text-2xl font-bold text-white">Stellex Pay</h1>
+              <p className="text-white/70 text-sm">Банк со звездами Telegram</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.98 }} onClick={onLogin} className="px-5 py-2.5 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 backdrop-blur-md">Войти</motion.button>
-            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }} onClick={onRegister} className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-fuchsia-500 via-violet-500 to-sky-500 hover:from-fuchsia-400 hover:to-sky-400 shadow-[0_10px_30px_rgba(99,102,241,.35)]">Регистрация</motion.button>
+          <div className="flex space-x-4">
+            <motion.button
+              onClick={onLogin}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-6 py-2 text-white border border-white/20 rounded-lg hover:bg-white/10 transition-all"
+            >
+              Войти
+            </motion.button>
+            <motion.button
+              onClick={onRegister}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-6 py-2 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-lg hover:from-purple-600 hover:to-blue-600 transition-all"
+            >
+              Регистрация
+            </motion.button>
           </div>
         </div>
-      </header>
 
-      {/* Hero */}
-      <section className="relative z-10 container mx-auto px-6 pt-6 pb-16 text-center">
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 mb-6 backdrop-blur">
-            <Calendar className="h-4 w-4 text-emerald-300" />
-            <span className="text-sm text-white/80">Новинка • Пластиковые карты с Telegram Stars</span>
+        {/* Hero Section */}
+        <div className="text-center mb-16">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-5xl font-bold text-white mb-6"
+          >
+            Будущее платежей
+            <br />
+            <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+              уже здесь
+            </span>
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="text-xl text-white/80 mb-8 max-w-2xl mx-auto"
+          >
+            Первый банк, который работает с Telegram Stars как с реальной валютой. 
+            Создавайте карты, переводите деньги, принимайте платежи.
+          </motion.p>
+
+          {/* Пластиковые карты анонс */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2 }}
+            className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/30 rounded-xl p-6 max-w-2xl mx-auto mb-8"
+          >
+            <div className="flex items-center justify-center mb-4">
+              <Calendar className="w-6 h-6 text-green-400 mr-2" />
+              <span className="text-green-400 font-semibold">Новинка ноября 2024</span>
+            </div>
+            <h3 className="text-2xl font-bold text-white mb-2">
+              Настоящие пластиковые карты
+            </h3>
+            <p className="text-white/80">
+              Получите физическую карту, которая работает с Telegram Stars в любом магазине мира!
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="flex justify-center space-x-4"
+          >
+            <motion.button
+              onClick={onRegister}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-8 py-4 bg-gradient-to-r from-purple-500 to-blue-500 text-white font-semibold rounded-lg flex items-center space-x-2 hover:from-purple-600 hover:to-blue-600 transition-all shadow-lg"
+            >
+              <span>Начать сейчас</span>
+              <ArrowRight className="w-5 h-5" />
+            </motion.button>
+            <motion.button
+              onClick={() => window.open('https://t.me/stellexbank_bot', '_blank')}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-8 py-4 bg-white/10 text-white font-semibold rounded-lg flex items-center space-x-2 hover:bg-white/20 transition-all border border-white/20"
+            >
+              <Smartphone className="w-5 h-5" />
+              <span>Открыть в Telegram</span>
+            </motion.button>
+          </motion.div>
+        </div>
+
+        {/* Features Tabs */}
+        <div className="mb-16">
+          <div className="flex justify-center mb-8">
+            <div className="bg-white/10 rounded-lg p-1">
+              <button
+                onClick={() => setActiveTab('users')}
+                className={`px-6 py-3 rounded-md font-medium transition-all ${
+                  activeTab === 'users'
+                    ? 'bg-white text-purple-900'
+                    : 'text-white/70 hover:text-white'
+                }`}
+              >
+                Для пользователей
+              </button>
+              <button
+                onClick={() => setActiveTab('developers')}
+                className={`px-6 py-3 rounded-md font-medium transition-all ${
+                  activeTab === 'developers'
+                    ? 'bg-white text-purple-900'
+                    : 'text-white/70 hover:text-white'
+                }`}
+              >
+                Для разработчиков
+              </button>
+            </div>
           </div>
-          <h1 className="text-4xl sm:text-6xl font-extrabold leading-tight tracking-tight">Платежи будущего — <ShineText>в Telegram</ShineText></h1>
-          <p className="mt-5 text-white/70 text-lg max-w-2xl mx-auto">Создавайте карты, принимайте и отправляйте платежи в звёздах. Быстро, безопасно и невероятно красиво.</p>
-        </motion.div>
-      </section>
 
-      {/* Features */}
-      <section className="container mx-auto px-6 pb-20">
-        <div className="grid md:grid-cols-3 gap-10">
-          {features.users.map((feature, index) => (
-            <TiltCard key={index}>
-              <div className="flex flex-col items-center text-center gap-5">
-                <div className={`h-16 w-16 rounded-2xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center shadow-lg shadow-fuchsia-500/20`}>
-                  <feature.icon className="h-7 w-7" />
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {features[activeTab].map((feature, index) => (
+              <motion.div
+                key={feature.title}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 hover:border-white/30 transition-all"
+              >
+                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg flex items-center justify-center mb-4">
+                  <feature.icon className="w-6 h-6 text-white" />
                 </div>
-                <div>
-                  <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                  <p className="text-white/70 leading-relaxed text-base max-w-xs mx-auto">{feature.description}</p>
-                </div>
-              </div>
-            </TiltCard>
-          ))}
-        </div>
-      </section>
-
-      {/* Partners marquee */}
-      <section className="relative overflow-hidden border-y border-white/10 py-8 bg-white/5 backdrop-blur-md">
-        <div className="animate-marquee whitespace-nowrap flex items-center gap-16 text-2xl font-bold uppercase tracking-widest text-white/70">
-          {['TON','FRAGMENT','TELEGRAM','STONEGRAM','WALLETTG'].map((partner,i)=>(
-            <span key={i} className="flex items-center gap-2"><Star className="h-5 w-5 text-fuchsia-400"/> {partner}</span>
-          ))}
-          {['TON','FRAGMENT','TELEGRAM','STONEGRAM','WALLETTG'].map((partner,i)=>(
-            <span key={`dup-${i}`} className="flex items-center gap-2"><Star className="h-5 w-5 text-fuchsia-400"/> {partner}</span>
-          ))}
-        </div>
-      </section>
-
-      {/* Tabs & Features */}
-      <section className="relative z-10 container mx-auto px-6 pb-20">
-        <div className="mx-auto max-w-4xl text-center">
-          <div className="mx-auto w-fit rounded-2xl bg-white/5 p-1 backdrop-blur border border-white/10 shadow-inner shadow-white/5">
-            <button onClick={()=>setActiveTab('users')} className={`px-6 py-3 rounded-xl text-sm font-medium transition-all ${activeTab==='users'?'bg-white text-neutral-900 shadow':'text-white/70 hover:text-white'}`}>Для пользователей</button>
-            <button onClick={()=>setActiveTab('developers')} className={`px-6 py-3 rounded-xl text-sm font-medium transition-all ${activeTab==='developers'?'bg-white text-neutral-900 shadow':'text-white/70 hover:text-white'}`}>Для разработчиков</button>
-          </div>
-          <div className="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {features[activeTab].map((f,i)=>(
-              <motion.div key={f.title} initial={{opacity:0,y:14}} whileInView={{opacity:1,y:0}} viewport={{once:true}} transition={{delay:i*0.05}} className="relative rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.06] to-white/[0.02] p-5 backdrop-blur-xl hover:from-white/[0.1] hover:border-white/20">
-                <div className={`h-11 w-11 rounded-xl bg-gradient-to-br ${f.gradient} grid place-items-center`}><f.icon className="h-6 w-6"/></div>
-                <div className="mt-4 text-lg font-semibold">{f.title}</div>
-                <p className="mt-2 text-white/70 text-sm leading-relaxed">{f.description}</p>
+                <h3 className="text-xl font-semibold text-white mb-2">
+                  {feature.title}
+                </h3>
+                <p className="text-white/70">
+                  {feature.description}
+                </p>
               </motion.div>
             ))}
           </div>
         </div>
-      </section>
 
-      {/* CTA */}
-      <section className="relative z-10 container mx-auto px-6 pb-20">
-        <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-r from-fuchsia-600/20 via-violet-600/20 to-sky-600/20 p-10 md:p-14 backdrop-blur-xl">
-          <div className="absolute -inset-x-10 -bottom-20 h-40 blur-3xl bg-gradient-to-r from-fuchsia-500/20 via-violet-500/20 to-sky-500/20" />
-          <div className="relative flex flex-col md:flex-row items-center md:items-end justify-between gap-8">
-            <div>
-              <h3 className="text-3xl md:text-4xl font-extrabold leading-tight">Готовы начать?</h3>
-              <p className="mt-2 text-white/80 max-w-xl">Присоединяйтесь к тысячам пользователей, которые уже пользуются Stellex Pay.</p>
-            </div>
-            <div className="flex items-center gap-3">
-              <motion.button onClick={onRegister} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }} className="px-8 py-4 rounded-2xl font-semibold bg-white text-neutral-900 hover:bg-neutral-100">Создать аккаунт</motion.button>
-              <motion.button onClick={()=>window.open('https://docs.stellex-pay.com','_blank')} whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.98 }} className="px-8 py-4 rounded-2xl border border-white/15 bg-white/5 hover:bg-white/10 backdrop-blur">Документация</motion.button>
-            </div>
+        {/* Stats */}
+        <div className="grid md:grid-cols-3 gap-8 mb-16">
+          <div className="text-center">
+            <div className="text-4xl font-bold text-white mb-2">10K+</div>
+            <div className="text-white/70">Пользователей</div>
+          </div>
+          <div className="text-center">
+            <div className="text-4xl font-bold text-white mb-2">₽2M+</div>
+            <div className="text-white/70">Оборот в Stars</div>
+          </div>
+          <div className="text-center">
+            <div className="text-4xl font-bold text-white mb-2">99.9%</div>
+            <div className="text-white/70">Время работы</div>
           </div>
         </div>
-      </section>
 
-      {/* Footer */}
-      <footer className="relative z-10 border-t border-white/10">
-        <div className="container mx-auto px-6 py-8 text-center">
-          <p className="text-white/60 text-sm">© {new Date().getFullYear()} Stellex Pay. Все права защищены.</p>
-          <p className="text-white/40 text-xs mt-2">@stellexbank_bot</p>
+        {/* CTA */}
+        <div className="text-center">
+          <h3 className="text-3xl font-bold text-white mb-4">
+            Готовы начать?
+          </h3>
+          <p className="text-white/80 mb-8 max-w-xl mx-auto">
+            Присоединяйтесь к тысячам пользователей, которые уже используют Stellex Pay
+          </p>
+          <div className="flex justify-center space-x-4">
+            <motion.button
+              onClick={onRegister}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-8 py-4 bg-gradient-to-r from-purple-500 to-blue-500 text-white font-semibold rounded-lg hover:from-purple-600 hover:to-blue-600 transition-all shadow-lg"
+            >
+              Создать аккаунт
+            </motion.button>
+            <motion.button
+              onClick={() => window.open('https://docs.stellex-pay.com', '_blank')}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-8 py-4 bg-white/10 text-white font-semibold rounded-lg hover:bg-white/20 transition-all border border-white/20"
+            >
+              Документация
+            </motion.button>
+          </div>
         </div>
-      </footer>
 
-      <style jsx global>{`
-        @keyframes shimmer {0%{background-position:0% 50%}100%{background-position:200% 50%}}
-        @keyframes marquee {0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
-        .animate-marquee {display:inline-flex;animation:marquee 20s linear infinite;}
-      `}</style>
+        {/* Footer */}
+        <div className="mt-16 pt-8 border-t border-white/20 text-center">
+          <p className="text-white/60 text-sm">
+            © 2024 Stellex Pay. Все права защищены.
+          </p>
+          <p className="text-white/40 text-xs mt-2">
+            @stellexbank_bot
+          </p>
+        </div>
+      </div>
     </div>
   )
 }

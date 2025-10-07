@@ -13,7 +13,9 @@ import {
   Mail,
   QrCode,
   Send,
-  Scan
+  Scan,
+  MessageSquare,
+  HelpCircle
 } from 'lucide-react'
 import VirtualCard from './VirtualCard'
 import TopUpModal from './TopUpModal'
@@ -29,6 +31,9 @@ import DeveloperDashboard from './DeveloperDashboard'
 import SupportDashboard from './SupportDashboard'
 import AdminDashboard from './AdminDashboard'
 import TelegramDebug from './TelegramDebug'
+import TransactionHistory from './TransactionHistory'
+import SettingsModal from './SettingsModal'
+import UserTicketsModal from './UserTicketsModal'
 
 export default function BankingApp() {
   const { user, logout } = useAuth()
@@ -39,8 +44,11 @@ export default function BankingApp() {
   const [showQRCodeModal, setShowQRCodeModal] = useState(false)
   const [selectedCard, setSelectedCard] = useState<Card | null>(null)
   const [isLoading, setIsLoading] = useState(false)
-  const [activeTab, setActiveTab] = useState<'cards' | 'history' | 'settings'>('cards')
+  const [activeTab, setActiveTab] = useState<'cards' | 'history' | 'settings' | 'support'>('cards')
   const [showCardDetailsModal, setShowCardDetailsModal] = useState(false)
+  const [showTransactionHistory, setShowTransactionHistory] = useState(false)
+  const [showSettings, setShowSettings] = useState(false)
+  const [showTickets, setShowTickets] = useState(false)
 
   // Загружаем данные пользователя и карты
   useEffect(() => {
@@ -323,32 +331,94 @@ export default function BankingApp() {
         </div>
       </div>
 
-      {/* Cards */}
+      {/* Main Content */}
       <div className="px-4 mb-6">
-        <h3 className="text-white font-bold text-lg mb-4">Мои карты</h3>
-        {cards.length === 0 ? (
+        {activeTab === 'cards' && (
+          <>
+            <h3 className="text-white font-bold text-lg mb-4">Мои карты</h3>
+            {cards.length === 0 ? (
+              <div className="text-center py-8">
+                <CreditCard className="w-16 h-16 text-white/30 mx-auto mb-4" />
+                <p className="text-white/70 mb-4">У вас пока нет карт</p>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleCreateCard}
+                  className="py-3 px-6 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold rounded-xl hover:from-purple-700 hover:to-blue-700 transition-all duration-300"
+                >
+                  Создать первую карту
+                </motion.button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {cards.map((card) => (
+                  <VirtualCard
+                    key={card.id}
+                    card={card}
+                    compact={true}
+                    onExpand={() => handleCardExpand(card.id)}
+                  />
+                ))}
+              </div>
+            )}
+          </>
+        )}
+
+        {activeTab === 'history' && (
           <div className="text-center py-8">
-            <CreditCard className="w-16 h-16 text-white/30 mx-auto mb-4" />
-            <p className="text-white/70 mb-4">У вас пока нет карт</p>
+            <History className="w-16 h-16 text-white/30 mx-auto mb-4" />
+            <h3 className="text-white font-bold text-lg mb-2">История транзакций</h3>
+            <p className="text-white/70 mb-4">Просматривайте все ваши операции</p>
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={handleCreateCard}
+              onClick={() => setShowTransactionHistory(true)}
               className="py-3 px-6 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold rounded-xl hover:from-purple-700 hover:to-blue-700 transition-all duration-300"
             >
-              Создать первую карту
+              Открыть историю
             </motion.button>
           </div>
-        ) : (
-          <div className="space-y-4">
-            {cards.map((card) => (
-              <VirtualCard
-                key={card.id}
-                card={card}
-                compact={true}
-                onExpand={() => handleCardExpand(card.id)}
-              />
-            ))}
+        )}
+
+        {activeTab === 'support' && (
+          <div className="text-center py-8">
+            <MessageSquare className="w-16 h-16 text-white/30 mx-auto mb-4" />
+            <h3 className="text-white font-bold text-lg mb-2">Поддержка</h3>
+            <p className="text-white/70 mb-4">Создайте заявку или просмотрите существующие</p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setShowTickets(true)}
+                className="py-3 px-6 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold rounded-xl hover:from-purple-700 hover:to-blue-700 transition-all duration-300"
+              >
+                Мои заявки
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setShowTickets(true)}
+                className="py-3 px-6 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all duration-300"
+              >
+                Создать заявку
+              </motion.button>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'settings' && (
+          <div className="text-center py-8">
+            <Settings className="w-16 h-16 text-white/30 mx-auto mb-4" />
+            <h3 className="text-white font-bold text-lg mb-2">Настройки</h3>
+            <p className="text-white/70 mb-4">Управление профилем и настройками</p>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => setShowSettings(true)}
+              className="py-3 px-6 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold rounded-xl hover:from-purple-700 hover:to-blue-700 transition-all duration-300"
+            >
+              Открыть настройки
+            </motion.button>
           </div>
         )}
       </div>
@@ -405,6 +475,29 @@ export default function BankingApp() {
             onTopUp={() => handleTopUp({ cardId: selectedCard.id, amount: 0, paymentMethod: 'card' })}
             onTransfer={() => setShowTransferModal(true)}
             onStarsTopUp={() => setShowTelegramStarsModal(true)}
+          />
+        )}
+
+        {showTransactionHistory && (
+          <TransactionHistory
+            onClose={() => setShowTransactionHistory(false)}
+          />
+        )}
+
+        {showSettings && (
+          <SettingsModal
+            user={user}
+            onClose={() => setShowSettings(false)}
+            onUpdateUser={(updates) => {
+              // Обновляем пользователя в контексте
+              console.log('User updated:', updates)
+            }}
+          />
+        )}
+
+        {showTickets && (
+          <UserTicketsModal
+            onClose={() => setShowTickets(false)}
           />
         )}
       </AnimatePresence>

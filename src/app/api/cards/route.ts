@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyToken } from '@/lib/auth'
 import { createCard } from '@/lib/cardUtils'
-import { supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase'
 
 export async function POST(request: NextRequest) {
   try {
     const authHeader = request.headers.get('authorization')
-    
+
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return NextResponse.json(
         { success: false, error: 'Токен не предоставлен' },
@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
 
     const token = authHeader.substring(7)
     const decoded = verifyToken(token)
-    
+
     if (!decoded) {
       return NextResponse.json(
         { success: false, error: 'Неверный токен' },
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Проверяем лимит карт (максимум 3)
-    const { data: existingCards, error: countError } = await supabase
+          const { data: existingCards, error: countError } = await supabaseAdmin.value
       .from('cards')
       .select('id')
       .eq('user_id', user_id)
@@ -66,9 +66,9 @@ export async function POST(request: NextRequest) {
     const newCard = createCard(user_id, holder_name)
 
     // Сохраняем в базу данных
-    const { data: card, error: insertError } = await supabase
+    const { data: card, error: insertError } = await supabaseAdmin.value
       .from('cards')
-      .insert(newCard)
+      .insert([newCard])
       .select()
       .single()
 
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Создаем транзакцию создания карты
-    const { error: transactionError } = await supabase
+    const { error: transactionError } = await supabaseAdmin.value
       .from('transactions')
       .insert({
         user_id: user_id,
@@ -112,7 +112,7 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const authHeader = request.headers.get('authorization')
-    
+
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return NextResponse.json(
         { success: false, error: 'Токен не предоставлен' },
@@ -122,7 +122,7 @@ export async function GET(request: NextRequest) {
 
     const token = authHeader.substring(7)
     const decoded = verifyToken(token)
-    
+
     if (!decoded) {
       return NextResponse.json(
         { success: false, error: 'Неверный токен' },
@@ -131,7 +131,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Получаем карты пользователя
-    const { data: cards, error } = await supabase
+    const { data: cards, error } = await supabaseAdmin.value
       .from('cards')
       .select('*')
       .eq('user_id', decoded.userId)

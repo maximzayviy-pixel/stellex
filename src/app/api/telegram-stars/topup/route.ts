@@ -1,12 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { verifyToken } from '@/lib/auth'
-import { supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase'
 import { calculateRublesFromStars } from '@/lib/cardUtils'
 
-export async function POST(request: NextRequest) {
+export async function POST(request) {
   try {
     const authHeader = request.headers.get('authorization')
-    
+
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return NextResponse.json(
         { success: false, error: 'Токен не предоставлен' },
@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
 
     const token = authHeader.substring(7)
     const decoded = verifyToken(token)
-    
+
     if (!decoded) {
       return NextResponse.json(
         { success: false, error: 'Неверный токен' },
@@ -27,14 +27,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { cardId, starsAmount } = body
 
-    if (!cardId || !starsAmount) {
-      return NextResponse.json(
-        { success: false, error: 'Неверные данные' },
-        { status: 400 }
-      )
-    }
-
-    if (starsAmount <= 0) {
+    if (!cardId || !starsAmount || starsAmount <= 0) {
       return NextResponse.json(
         { success: false, error: 'Количество звезд должно быть больше 0' },
         { status: 400 }
@@ -42,7 +35,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Получаем карту
-    const { data: card, error: cardError } = await supabase
+    const { data: card, error: cardError } = await supabaseAdmin
       .from('cards')
       .select('*')
       .eq('id', cardId)
@@ -74,7 +67,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Обновляем баланс карты
-    const { error: updateError } = await supabase
+    const { error: updateError } = await supabaseAdmin
       .from('cards')
       .update({
         balance: card.balance + rublesAmount,
@@ -90,15 +83,15 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Создаем транзакцию
-    const { error: transactionError } = await supabase
+    // Записываем транзакцию
+    const { error: transactionError } = await supabaseAdmin
       .from('transactions')
       .insert({
         user_id: decoded.userId,
         card_id: cardId,
         type: 'telegram_stars_topup',
         amount: rublesAmount,
-        description: `Пополнение звездами Telegram (${starsAmount} ⭐)`,
+        description: `Пополнение на ${starsAmount} Telegram Stars`,
         status: 'completed'
       })
 
@@ -108,11 +101,11 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Пополнение выполнено успешно',
-      rublesAmount
+      message: 'Баланс успешно пополнен',
+      newBalance: card.balance + rublesAmount
     })
   } catch (error) {
-    console.error('Stars topup error:', error)
+    console.error('Telegram Stars top-up API error:', error)
     return NextResponse.json(
       { success: false, error: 'Внутренняя ошибка сервера' },
       { status: 500 }

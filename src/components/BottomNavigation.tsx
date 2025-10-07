@@ -2,11 +2,11 @@
 
 import React from 'react'
 import { motion } from 'framer-motion'
-import { CreditCard, History, Settings } from 'lucide-react'
+import { CreditCard, History, Settings, MessageSquare } from 'lucide-react'
 
 interface BottomNavigationProps {
-  activeTab: 'cards' | 'history' | 'settings'
-  onTabChange: (tab: 'cards' | 'history' | 'settings') => void
+  activeTab: 'cards' | 'history' | 'settings' | 'support'
+  onTabChange: (tab: 'cards' | 'history' | 'settings' | 'support') => void
 }
 
 export default function BottomNavigation({ activeTab, onTabChange }: BottomNavigationProps) {
@@ -20,6 +20,11 @@ export default function BottomNavigation({ activeTab, onTabChange }: BottomNavig
       id: 'history' as const,
       label: 'История',
       icon: History
+    },
+    {
+      id: 'support' as const,
+      label: 'Поддержка',
+      icon: MessageSquare
     },
     {
       id: 'settings' as const,

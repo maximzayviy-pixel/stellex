@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyToken } from '@/lib/auth'
-import { supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase'
 
 export async function POST(request: NextRequest) {
   try {
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { fromCardId, toCardNumber, amount, description } = body
+    const { fromCardId, toCardNumber, amount } = body
 
     if (!fromCardId || !toCardNumber || !amount) {
       return NextResponse.json(
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Получаем карту отправителя
-    const { data: fromCard, error: fromCardError } = await supabase
+    const { data: fromCard, error: fromCardError } = await supabaseAdmin
       .from('cards')
       .select('*')
       .eq('id', fromCardId)
@@ -70,9 +70,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Получаем карту получателя
-    const { data: toCard, error: toCardError } = await supabase
+    const { data: toCard, error: toCardError } = await supabaseAdmin
       .from('cards')
-      .select('*, users!inner(*)')
+      .select('*')
       .eq('card_number', toCardNumber)
       .single()
 
@@ -98,20 +98,67 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Выполняем перевод в транзакции
-    const { error: transferError } = await supabase.rpc('transfer_money', {
-      from_card_id: fromCardId,
-      to_card_id: toCard.id,
-      transfer_amount: amount,
-      transfer_description: description || 'Перевод между картами'
-    })
+    // Выполняем перевод
+    const newFromBalance = fromCard.balance - amount
+    const newToBalance = toCard.balance + amount
 
-    if (transferError) {
-      console.error('Transfer error:', transferError)
+    // Обновляем баланс карты отправителя
+    const { error: updateFromError } = await supabaseAdmin
+      .from('cards')
+      .update({ balance: newFromBalance })
+      .eq('id', fromCardId)
+
+    if (updateFromError) {
+      console.error('Update from card error:', updateFromError)
       return NextResponse.json(
-        { success: false, error: 'Ошибка перевода' },
+        { success: false, error: 'Ошибка обновления карты отправителя' },
         { status: 500 }
       )
+    }
+
+    // Обновляем баланс карты получателя
+    const { error: updateToError } = await supabaseAdmin
+      .from('cards')
+      .update({ balance: newToBalance })
+      .eq('id', toCard.id)
+
+    if (updateToError) {
+      console.error('Update to card error:', updateToError)
+      return NextResponse.json(
+        { success: false, error: 'Ошибка обновления карты получателя' },
+        { status: 500 }
+      )
+    }
+
+    // Создаем записи транзакций
+    const { error: transactionFromError } = await supabaseAdmin
+      .from('transactions')
+      .insert({
+        user_id: decoded.userId,
+        card_id: fromCardId,
+        type: 'transfer_out',
+        amount: -amount,
+        description: `Перевод на карту ${toCardNumber}`,
+        status: 'completed'
+      })
+
+    if (transactionFromError) {
+      console.error('Transaction from error:', transactionFromError)
+    }
+
+    const { error: transactionToError } = await supabaseAdmin
+      .from('transactions')
+      .insert({
+        user_id: toCard.user_id,
+        card_id: toCard.id,
+        type: 'transfer_in',
+        amount: amount,
+        description: `Перевод с карты ${fromCard.card_number}`,
+        status: 'completed'
+      })
+
+    if (transactionToError) {
+      console.error('Transaction to error:', transactionToError)
     }
 
     return NextResponse.json({

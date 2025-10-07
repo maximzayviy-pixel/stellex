@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { NextResponse } from 'next/server'
+import { supabaseAdmin } from '@/lib/supabase'
 
-export async function POST(request: NextRequest) {
+export async function POST(request) {
   try {
     const authHeader = request.headers.get('authorization')
-    
+
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return NextResponse.json(
         { success: false, error: 'API ключ не предоставлен' },
@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     const apiKey = authHeader.substring(7)
 
     // Проверяем API ключ
-    const { data: developer, error: developerError } = await supabase
+    const { data: developer, error: developerError } = await supabaseAdmin
       .from('developers')
       .select('*')
       .eq('api_key', apiKey)
@@ -24,22 +24,15 @@ export async function POST(request: NextRequest) {
 
     if (developerError || !developer) {
       return NextResponse.json(
-        { success: false, error: 'Неверный API ключ' },
-        { status: 401 }
+        { success: false, error: 'Неверный API ключ или разработчик неактивен' },
+        { status: 403 }
       )
     }
 
     const body = await request.json()
-    const { amount, description, card_id } = body
+    const { amount, description, redirect_url, webhook_url } = body
 
-    if (!amount || !description) {
-      return NextResponse.json(
-        { success: false, error: 'Неверные данные' },
-        { status: 400 }
-      )
-    }
-
-    if (amount <= 0) {
+    if (!amount || amount <= 0 || !description) {
       return NextResponse.json(
         { success: false, error: 'Сумма должна быть больше 0' },
         { status: 400 }
@@ -47,13 +40,15 @@ export async function POST(request: NextRequest) {
     }
 
     // Создаем платежный запрос
-    const { data: paymentRequest, error: createError } = await supabase
+    const { data: paymentRequest, error: createError } = await supabaseAdmin
       .from('payment_requests')
       .insert({
         developer_id: developer.id,
         amount,
         description,
-        status: 'pending'
+        status: 'pending',
+        redirect_url: redirect_url || null,
+        webhook_url: webhook_url || null
       })
       .select()
       .single()
@@ -75,7 +70,7 @@ export async function POST(request: NextRequest) {
       payment_url: paymentUrl
     })
   } catch (error) {
-    console.error('Create payment error:', error)
+    console.error('Create payment API error:', error)
     return NextResponse.json(
       { success: false, error: 'Внутренняя ошибка сервера' },
       { status: 500 }
