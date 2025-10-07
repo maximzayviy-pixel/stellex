@@ -13,8 +13,29 @@ export async function GET(request: NextRequest) {
 
     const decodedToken = verifyToken(token)
 
-    if (!decodedToken || decodedToken.role !== 'admin') {
-      return NextResponse.json({ success: false, error: 'Admin access required' }, { status: 403 })
+    if (!decodedToken) {
+      return NextResponse.json({ success: false, error: 'Invalid token' }, { status: 401 })
+    }
+
+    // Получаем актуальную роль пользователя из базы данных
+    const { data: currentUser, error: userError } = await supabaseAdmin.value
+      .from('users')
+      .select('role')
+      .eq('id', decodedToken.userId)
+      .single()
+
+    if (userError) {
+      console.error('Error fetching user role:', userError)
+      return NextResponse.json({ success: false, error: 'Error fetching user role' }, { status: 500 })
+    }
+
+    console.log('Current user role from DB:', currentUser.role)
+
+    if (currentUser.role !== 'admin') {
+      return NextResponse.json({ 
+        success: false, 
+        error: `Admin access required. Current role: ${currentUser.role}` 
+      }, { status: 403 })
     }
 
     const { searchParams } = new URL(request.url)
@@ -81,8 +102,27 @@ export async function PUT(request: NextRequest) {
 
     const decodedToken = verifyToken(token)
 
-    if (!decodedToken || decodedToken.role !== 'admin') {
-      return NextResponse.json({ success: false, error: 'Admin access required' }, { status: 403 })
+    if (!decodedToken) {
+      return NextResponse.json({ success: false, error: 'Invalid token' }, { status: 401 })
+    }
+
+    // Получаем актуальную роль пользователя из базы данных
+    const { data: currentUser, error: userError } = await supabaseAdmin.value
+      .from('users')
+      .select('role')
+      .eq('id', decodedToken.userId)
+      .single()
+
+    if (userError) {
+      console.error('Error fetching user role:', userError)
+      return NextResponse.json({ success: false, error: 'Error fetching user role' }, { status: 500 })
+    }
+
+    if (currentUser.role !== 'admin') {
+      return NextResponse.json({ 
+        success: false, 
+        error: `Admin access required. Current role: ${currentUser.role}` 
+      }, { status: 403 })
     }
 
     const { userId, updates } = await request.json()
@@ -125,8 +165,27 @@ export async function DELETE(request: NextRequest) {
 
     const decodedToken = verifyToken(token)
 
-    if (!decodedToken || decodedToken.role !== 'admin') {
-      return NextResponse.json({ success: false, error: 'Admin access required' }, { status: 403 })
+    if (!decodedToken) {
+      return NextResponse.json({ success: false, error: 'Invalid token' }, { status: 401 })
+    }
+
+    // Получаем актуальную роль пользователя из базы данных
+    const { data: currentUser, error: userError } = await supabaseAdmin.value
+      .from('users')
+      .select('role')
+      .eq('id', decodedToken.userId)
+      .single()
+
+    if (userError) {
+      console.error('Error fetching user role:', userError)
+      return NextResponse.json({ success: false, error: 'Error fetching user role' }, { status: 500 })
+    }
+
+    if (currentUser.role !== 'admin') {
+      return NextResponse.json({ 
+        success: false, 
+        error: `Admin access required. Current role: ${currentUser.role}` 
+      }, { status: 403 })
     }
 
     const { searchParams } = new URL(request.url)

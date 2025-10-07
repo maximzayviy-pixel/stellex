@@ -46,3 +46,4 @@ CREATE POLICY "Admins can update API key requests" ON api_key_requests
       AND users.role = 'admin'
     )
   );
+

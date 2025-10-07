@@ -21,27 +21,48 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Проверяем, что пользователь - разработчик
-    if (decoded.role !== 'developer') {
+    // Проверяем, что пользователь - разработчик или админ
+    if (decoded.role !== 'developer' && decoded.role !== 'admin') {
       return NextResponse.json(
-        { success: false, error: 'Доступ только для разработчиков' },
+        { success: false, error: 'Доступ только для разработчиков и администраторов' },
         { status: 403 }
       )
     }
 
     // Получаем данные разработчика
-    const { data: developer, error: devError } = await supabaseAdmin.value
-      .from('developers')
-      .select('*')
-      .eq('user_id', decoded.userId)
-      .single()
+    let developer = null
+    
+    if (decoded.role === 'admin') {
+      // Для админа создаем виртуальный профиль
+      developer = {
+        id: decoded.userId,
+        user_id: decoded.userId,
+        api_key: 'admin_access',
+        company_name: 'Stellex Admin',
+        website: 'https://stellex.space',
+        description: 'Администратор системы',
+        is_active: true,
+        total_earnings: 0,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }
+    } else {
+      // Для разработчика получаем из базы
+      const { data: devData, error: devError } = await supabaseAdmin.value
+        .from('developers')
+        .select('*')
+        .eq('user_id', decoded.userId)
+        .single()
 
-    if (devError) {
-      console.error('Developer profile error:', devError)
-      return NextResponse.json(
-        { success: false, error: 'Ошибка загрузки профиля разработчика' },
-        { status: 500 }
-      )
+      if (devError) {
+        console.error('Developer profile error:', devError)
+        return NextResponse.json(
+          { success: false, error: 'Ошибка загрузки профиля разработчика' },
+          { status: 500 }
+        )
+      }
+      
+      developer = devData
     }
 
     // Получаем платежные запросы разработчика
@@ -89,9 +110,9 @@ export async function PUT(request: NextRequest) {
       )
     }
 
-    if (decoded.role !== 'developer') {
+    if (decoded.role !== 'developer' && decoded.role !== 'admin') {
       return NextResponse.json(
-        { success: false, error: 'Доступ только для разработчиков' },
+        { success: false, error: 'Доступ только для разработчиков и администраторов' },
         { status: 403 }
       )
     }

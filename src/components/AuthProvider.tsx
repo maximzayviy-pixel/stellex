@@ -44,23 +44,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } else {
           console.log('No token found, checking Telegram Web App...')
           
-          // Ждем инициализации Telegram WebApp
-          if (isTelegramWebApp && isReady) {
-            console.log('In Telegram Web App, getting user data...')
-            if (tgUser) {
-              console.log('Telegram user found, authenticating...', tgUser)
+          // Проверяем Telegram WebApp
+          if (isTelegramWebApp) {
+            if (isReady && tgUser) {
+              console.log('In Telegram Web App with user data, authenticating...', tgUser)
               // Авторизуемся через Telegram
               await authenticateWithTelegram(tgUser)
-            } else {
-              console.log('No Telegram user found, showing web login form')
-              setShowWebLogin(true)
+            } else if (isReady && !tgUser) {
+              // Telegram WebApp готов, но нет данных пользователя - показываем инструкции
+              console.log('Telegram WebApp ready but no user data, showing instructions')
+              setShowTelegramInstructions(true)
               setLoading(false)
+            } else {
+              // Telegram WebApp найден, но не готов - ждем
+              console.log('Telegram WebApp found but not ready, waiting...')
+              return // Не устанавливаем loading = false, продолжаем ждать
             }
-          } else if (webApp && !isReady) {
-            // Telegram WebApp найден, но initData пустой - показываем инструкции
-            console.log('Telegram WebApp found but initData is empty, showing instructions')
-            setShowTelegramInstructions(true)
-            setLoading(false)
           } else {
             console.log('Not in Telegram Web App, showing web login form')
             setShowWebLogin(true)

@@ -19,3 +19,4 @@ WHERE table_schema = 'public'
 AND table_name = 'cards'
 ORDER BY ordinal_position;
 
+

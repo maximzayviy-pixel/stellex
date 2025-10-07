@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Проверяем, существует ли пользователь с таким email
-    const { data: existingUser } = await supabaseAdmin.value.value
+    const { data: existingUser } = await supabaseAdmin.value
       .from('users')
       .select('id')
       .eq('email', email)

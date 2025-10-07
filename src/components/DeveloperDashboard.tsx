@@ -37,6 +37,26 @@ export default function DeveloperDashboard() {
     try {
       setIsLoading(true)
       
+      // Если пользователь админ, создаем виртуальный профиль разработчика
+      if (user?.role === 'admin') {
+        const adminDeveloper: Developer = {
+          id: user.id,
+          user_id: user.id,
+          api_key: 'admin_access',
+          company_name: 'Stellex Admin',
+          website: 'https://stellex.space',
+          description: 'Администратор системы',
+          is_active: true,
+          total_earnings: 0,
+          created_at: user.created_at,
+          updated_at: user.updated_at
+        }
+        setDeveloper(adminDeveloper)
+        setPaymentRequests([])
+        setIsLoading(false)
+        return
+      }
+      
       // Загружаем данные разработчика
       const response = await fetch('/api/developer/profile', {
         headers: {

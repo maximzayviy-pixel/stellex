@@ -1,7 +1,7 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { loginEmail } from '@/lib/auth'
 
-export async function POST(request) {
+export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json()
 

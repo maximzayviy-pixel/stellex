@@ -225,3 +225,4 @@ export default function VirtualCard({ card, compact = false, onExpand }: Virtual
   )
 }
 
+
