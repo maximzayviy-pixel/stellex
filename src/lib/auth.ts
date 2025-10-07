@@ -29,16 +29,18 @@ export async function authenticateUser(telegramId: number, userData: { first_nam
 
     if (existingUser) {
       // Обновляем данные существующего пользователя
+      const updateData = {
+        first_name: userData.first_name,
+        last_name: userData.last_name,
+        username: userData.username,
+        language_code: userData.language_code,
+        is_premium: userData.is_premium,
+        updated_at: new Date().toISOString()
+      }
+      
       const { data: updatedUser, error: updateError } = await supabase
         .from('users')
-        .update({
-          first_name: userData.first_name,
-          last_name: userData.last_name,
-          username: userData.username,
-          language_code: userData.language_code,
-          is_premium: userData.is_premium,
-          updated_at: new Date().toISOString()
-        } as any)
+        .update(updateData)
         .eq('id', existingUser.id)
         .select()
         .single()
