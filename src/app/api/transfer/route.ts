@@ -40,6 +40,15 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Валидация номера карты получателя
+    const cleanCardNumber = toCardNumber.replace(/\s/g, '')
+    if (!/^666\d{13}$/.test(cleanCardNumber)) {
+      return NextResponse.json(
+        { success: false, error: 'Неверный формат номера карты. Карта должна начинаться с 666 и содержать 16 цифр' },
+        { status: 400 }
+      )
+    }
+
     // Получаем карту отправителя
     const { data: fromCard, error: fromCardError } = await supabaseAdmin.value
       .from('cards')
@@ -73,7 +82,7 @@ export async function POST(request: NextRequest) {
     const { data: toCard, error: toCardError } = await supabaseAdmin.value
       .from('cards')
       .select('*')
-      .eq('card_number', toCardNumber)
+      .eq('card_number', cleanCardNumber)
       .single()
 
     if (toCardError || !toCard) {

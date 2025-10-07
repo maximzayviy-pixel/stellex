@@ -87,6 +87,30 @@ export default function DeveloperDashboard() {
     }
   }
 
+  const handleGenerateApiKey = async () => {
+    try {
+      const response = await fetch('/api/developer/generate-api-key', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+        }
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        // Обновляем API ключ в состоянии
+        setDeveloper(prev => prev ? { ...prev, api_key: data.apiKey } : null)
+        alert('Новый API ключ сгенерирован!')
+      } else {
+        alert(`Ошибка: ${data.error}`)
+      }
+    } catch (error) {
+      console.error('Error generating API key:', error)
+      alert('Ошибка генерации API ключа')
+    }
+  }
+
   const generatePaymentButton = () => {
     const buttonCode = `<button onclick="openStellexPay('${developer?.api_key}', 100, 'Тестовый платеж')">
   ОПЛАТИТЬ С ПОМОЩЬЮ STELLEX PAY
@@ -221,6 +245,12 @@ function openStellexPay(apiKey, amount, description) {
                   className="p-2 rounded-lg bg-white/20 hover:bg-white/30 transition-colors"
                 >
                   <Copy className="w-4 h-4 text-white" />
+                </button>
+                <button
+                  onClick={handleGenerateApiKey}
+                  className="px-3 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 transition-colors text-white text-sm font-medium"
+                >
+                  Новый ключ
                 </button>
               </div>
             </div>

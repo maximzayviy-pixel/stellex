@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '20')
     const type = searchParams.get('type') || ''
 
-    let query = supabaseAdmin.value.value
+    let query = supabaseAdmin.value
       .from('transactions')
       .select(`
         *,
