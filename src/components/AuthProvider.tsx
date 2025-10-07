@@ -110,35 +110,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const authenticateWithTelegram = async (tgUser: { id: number; first_name: string; last_name?: string; username?: string; language_code?: string; is_premium?: boolean }) => {
-    try {
-      const response = await fetch('/api/auth/telegram', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(tgUser)
-      })
+         const authenticateWithTelegram = async (tgUser: { id: number; first_name: string; last_name?: string; username?: string; language_code?: string; is_premium?: boolean }) => {
+           try {
+             console.log('Sending Telegram user data to API:', tgUser)
+             
+             const response = await fetch('/api/auth/telegram', {
+               method: 'POST',
+               headers: {
+                 'Content-Type': 'application/json'
+               },
+               body: JSON.stringify(tgUser)
+             })
 
-      if (response.ok) {
-        const data = await response.json()
-        if (data.success) {
-          setUser(data.user)
-          localStorage.setItem('auth_token', data.token)
-          setError(null)
-        } else {
-          setError('Ошибка авторизации через Telegram')
-        }
-      } else {
-        setError('Ошибка подключения к серверу')
-      }
-    } catch (error) {
-      console.error('Telegram auth error:', error)
-      setError('Ошибка авторизации через Telegram')
-    } finally {
-      setLoading(false)
-    }
-  }
+             console.log('API response status:', response.status)
+             
+             if (response.ok) {
+               const data = await response.json()
+               console.log('API response data:', data)
+               
+               if (data.success) {
+                 setUser(data.user)
+                 localStorage.setItem('auth_token', data.token)
+                 setError(null)
+               } else {
+                 console.error('API returned error:', data.error)
+                 setError(data.error || 'Ошибка авторизации через Telegram')
+               }
+             } else {
+               const errorData = await response.json().catch(() => ({}))
+               console.error('API request failed:', response.status, errorData)
+               setError(errorData.error || 'Ошибка подключения к серверу')
+             }
+           } catch (error) {
+             console.error('Telegram auth error:', error)
+             setError('Ошибка авторизации через Telegram')
+           } finally {
+             setLoading(false)
+           }
+         }
 
   const login = (token: string) => {
     localStorage.setItem('auth_token', token)
