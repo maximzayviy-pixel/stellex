@@ -24,10 +24,10 @@ export async function GET(request: NextRequest) {
       transactionsResult,
       developersResult
     ] = await Promise.all([
-      supabaseAdmin.value.value.from('users').select('id, total_spent', { count: 'exact' }),
-      supabaseAdmin.value.value.from('cards').select('id, balance', { count: 'exact' }),
-      supabaseAdmin.value.value.from('transactions').select('amount', { count: 'exact' }),
-      supabaseAdmin.value.value.from('developers').select('id, total_earnings', { count: 'exact' })
+      supabaseAdmin.value.from('users').select('id, total_spent', { count: 'exact' }),
+      supabaseAdmin.value.from('cards').select('id, balance', { count: 'exact' }),
+      supabaseAdmin.value.from('transactions').select('amount', { count: 'exact' }),
+      supabaseAdmin.value.from('developers').select('id, total_earnings', { count: 'exact' })
     ])
 
     const totalUsers = usersResult.count || 0

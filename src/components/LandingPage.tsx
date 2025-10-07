@@ -253,7 +253,7 @@ export default function LandingPage() {
                 transition={{ duration: 0.6, delay: 0.8 }}
                 className="inline-block bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-full px-6 py-2 mb-6"
               >
-                <span className="text-purple-300 font-semibold text-sm tracking-wider">НОВИНКА НОЯБРЯ 2024</span>
+                <span className="text-purple-300 font-semibold text-sm tracking-wider">СКОРО</span>
               </motion.div>
               
               <h3 className="text-white font-bold text-4xl md:text-5xl mb-6 bg-gradient-to-r from-white via-purple-100 to-pink-100 bg-clip-text text-transparent">

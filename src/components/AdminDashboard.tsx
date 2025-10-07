@@ -78,9 +78,15 @@ export default function AdminDashboard() {
         }
       })
 
+      console.log('Stats response status:', statsResponse.status)
+      
       if (statsResponse.ok) {
         const statsData = await statsResponse.json()
+        console.log('Stats data:', statsData)
         setStats(statsData.stats)
+      } else {
+        const errorData = await statsResponse.json()
+        console.error('Stats error:', errorData)
       }
 
       // Загружаем пользователей
@@ -107,9 +113,15 @@ export default function AdminDashboard() {
         }
       })
 
+      console.log('Users response status:', usersResponse.status)
+
       if (usersResponse.ok) {
         const usersData = await usersResponse.json()
+        console.log('Users data:', usersData)
         setUsers(usersData.users)
+      } else {
+        const errorData = await usersResponse.json()
+        console.error('Users error:', errorData)
       }
     } catch (error) {
       console.error('Error loading users:', error)

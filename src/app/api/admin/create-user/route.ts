@@ -21,10 +21,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Invalid token' }, { status: 401 })
     }
 
-    if (decodedToken.role !== 'admin') {
+    // Получаем актуальную роль пользователя из базы данных
+    const { data: currentUser, error: userError } = await supabaseAdmin.value
+      .from('users')
+      .select('role')
+      .eq('id', decodedToken.userId)
+      .single()
+
+    if (userError) {
+      console.error('Error fetching user role:', userError)
+      return NextResponse.json({ success: false, error: 'Error fetching user role' }, { status: 500 })
+    }
+
+    console.log('Current user role from DB:', currentUser.role)
+
+    if (currentUser.role !== 'admin') {
       return NextResponse.json({ 
         success: false, 
-        error: `Admin access required. Current role: ${decodedToken.role}` 
+        error: `Admin access required. Current role: ${currentUser.role}` 
       }, { status: 403 })
     }
 
@@ -39,7 +53,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Проверяем, существует ли пользователь с таким email
-    const { data: existingUser } = await supabaseAdmin.value.value
+    const { data: existingUser } = await supabaseAdmin.value
       .from('users')
       .select('id')
       .eq('email', email)
@@ -53,7 +67,7 @@ export async function POST(request: NextRequest) {
     const passwordHash = await bcrypt.hash(password, 10)
 
     // Создаем пользователя
-    const { data: user, error: userError } = await supabaseAdmin.value.value
+    const { data: user, error: createUserError } = await supabaseAdmin.value
       .from('users')
       .insert({
         email,
@@ -67,8 +81,8 @@ export async function POST(request: NextRequest) {
       .select()
       .single()
 
-    if (userError) {
-      console.error('Error creating user:', userError)
+    if (createUserError) {
+      console.error('Error creating user:', createUserError)
       return NextResponse.json({ success: false, error: 'Failed to create user' }, { status: 500 })
     }
 
