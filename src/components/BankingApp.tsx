@@ -352,9 +352,23 @@ export default function BankingApp() {
               setShowCardDetailsModal(false)
               setSelectedCard(null)
             }}
-            onTopUp={() => handleTopUp({ cardId: selectedCard.id, amount: 0, paymentMethod: 'card' })}
-            onTransfer={() => setShowTransferModal(true)}
-            onStarsTopUp={() => setShowTelegramStarsModal(true)}
+            onTopUp={() => {
+              setShowCardDetailsModal(false)
+              setShowTopUpModal(true)
+            }}
+            onTransfer={() => {
+              setShowCardDetailsModal(false)
+              setShowTransferModal(true)
+            }}
+            onQRCode={() => {
+              setShowCardDetailsModal(false)
+              setShowQRCodeModal(true)
+            }}
+            onScan={() => {
+              setShowCardDetailsModal(false)
+              setShowQRCodeModal(true)
+            }}
+            showNotification={showNotification}
           />
         )}
 

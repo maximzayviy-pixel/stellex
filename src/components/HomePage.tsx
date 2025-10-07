@@ -175,12 +175,16 @@ export default function HomePage({
                 onClick={() => onCardClick(card)}
               >
                 <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-14 h-10 bg-white/20 rounded-lg flex items-center justify-center">
-                      <CreditCard className="w-7 h-5" />
-                    </div>
+            <div className="flex items-center space-x-4">
+              <div className="w-14 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+                <img 
+                  src="https://i.imgur.com/ogTdloq.png" 
+                  alt="Stellex Logo" 
+                  className="w-8 h-8 rounded"
+                />
+              </div>
                     <div className="flex flex-col">
-                      <h3 className="font-bold text-xl mb-1">VISA</h3>
+                      <h3 className="font-bold text-xl mb-1">{card.card_name || 'VISA'}</h3>
                       <p className="text-white/70 text-sm">**** {card.card_number.slice(-4)}</p>
                     </div>
                   </div>

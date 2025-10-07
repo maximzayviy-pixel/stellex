@@ -1,12 +1,27 @@
 'use client'
 
-import { AuthProvider } from '@/components/AuthProvider'
-import BankingApp from '@/components/BankingApp'
+import React, { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
+import { 
+  Star, 
+  CreditCard, 
+  Shield, 
+  Zap, 
+  Users, 
+  Code, 
+  ArrowRight, 
+  CheckCircle,
+  Globe,
+  Smartphone,
+  Lock,
+  TrendingUp,
+  Award,
+  ChevronDown,
+  Menu,
+  X
+} from 'lucide-react'
+import AppRouter from '../components/AppRouter'
 
-export default function Home() {
-  return (
-    <AuthProvider>
-      <BankingApp />
-    </AuthProvider>
-  )
+export default function LandingPage() {
+  return <AppRouter />
 }

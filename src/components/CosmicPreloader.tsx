@@ -125,8 +125,12 @@ export default function CosmicPreloader({ user, onComplete }: CosmicPreloaderPro
               animate={{ rotate: 360 }}
               transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
             >
-              <div className="w-full h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white text-4xl font-bold">
-                {user.first_name?.charAt(0) || 'U'}
+              <div className="w-full h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center p-4">
+                <img 
+                  src="https://i.imgur.com/ogTdloq.png" 
+                  alt="Stellex Logo" 
+                  className="w-full h-full rounded-full"
+                />
               </div>
               <div className="absolute inset-0 border-4 border-white/20 rounded-full animate-ping" />
             </motion.div>
