@@ -112,6 +112,13 @@ export function useTelegramWebApp(): UseTelegramWebAppReturn {
         colorScheme: tg.colorScheme
       })
 
+      // Проверяем initData
+      if (!tg.initData && !tg.initDataUnsafe) {
+        console.warn('Telegram WebApp found but initData is empty. Make sure to open via bot button, not direct link!')
+        setIsTelegramWebApp(false)
+        return
+      }
+
       // Инициализируем WebApp
       tg.ready()
       tg.expand()
@@ -120,7 +127,7 @@ export function useTelegramWebApp(): UseTelegramWebAppReturn {
       setIsTelegramWebApp(true)
       setIsReady(true)
       
-      console.log('Telegram WebApp initialized successfully')
+      console.log('Telegram WebApp initialized successfully with initData:', !!tg.initData)
     }
 
     // Проверяем сразу

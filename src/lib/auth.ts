@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
 import { User } from '@/types'
-import { supabase } from './supabase'
+import { supabaseAdmin } from './supabase'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
 
@@ -15,13 +15,14 @@ export interface AuthResult {
 export async function authenticateUser(telegramId: number, userData: { first_name: string; last_name?: string; username?: string; language_code?: string; is_premium?: boolean }): Promise<AuthResult> {
   try {
     // Ищем пользователя по Telegram ID
-    const { data: existingUser, error: fetchError } = await supabase.value
+    const { data: existingUser, error: fetchError } = await supabaseAdmin.value
       .from('users')
       .select('*')
       .eq('telegram_id', telegramId)
       .single()
 
     if (fetchError && fetchError.code !== 'PGRST116') {
+      console.error('Error fetching user:', fetchError)
       return { success: false, error: 'Ошибка базы данных' }
     }
 
@@ -38,7 +39,7 @@ export async function authenticateUser(telegramId: number, userData: { first_nam
         updated_at: new Date().toISOString()
       }
       
-      const { data: updatedUser, error: updateError } = await supabase.value
+      const { data: updatedUser, error: updateError } = await supabaseAdmin.value
         .from('users')
         .update(updateData)
         .eq('id', existingUser.id)
@@ -46,13 +47,14 @@ export async function authenticateUser(telegramId: number, userData: { first_nam
         .single()
 
       if (updateError) {
+        console.error('Error updating user:', updateError)
         return { success: false, error: 'Ошибка обновления пользователя' }
       }
 
       user = updatedUser
     } else {
       // Создаем нового пользователя
-      const { data: newUser, error: createError } = await supabase.value
+      const { data: newUser, error: createError } = await supabaseAdmin.value
         .from('users')
         .insert({
           telegram_id: telegramId,
@@ -69,6 +71,7 @@ export async function authenticateUser(telegramId: number, userData: { first_nam
         .single()
 
       if (createError) {
+        console.error('User creation error:', createError)
         return { success: false, error: 'Ошибка создания пользователя' }
       }
 
@@ -95,7 +98,7 @@ export async function authenticateUser(telegramId: number, userData: { first_nam
 
 export async function authenticateEmail(email: string, password: string): Promise<AuthResult> {
   try {
-    const { data: user, error } = await supabase.value
+    const { data: user, error } = await supabaseAdmin.value
       .from('users')
       .select('*')
       .eq('email', email)
@@ -134,7 +137,7 @@ export async function authenticateEmail(email: string, password: string): Promis
 export async function registerEmail(email: string, password: string, firstName: string, lastName?: string): Promise<AuthResult> {
   try {
     // Проверяем, существует ли пользователь с таким email
-    const { data: existingUser } = await supabase.value
+        const { data: existingUser } = await supabaseAdmin.value
       .from('users')
       .select('id')
       .eq('email', email)
@@ -146,7 +149,7 @@ export async function registerEmail(email: string, password: string, firstName: 
 
     const passwordHash = await bcrypt.hash(password, 10)
 
-    const { data: user, error } = await supabase.value
+    const { data: user, error } = await supabaseAdmin.value
       .from('users')
       .insert({
         email,
@@ -184,7 +187,7 @@ export async function registerEmail(email: string, password: string, firstName: 
 export async function loginEmail(email: string, password: string): Promise<AuthResult> {
   try {
     // Находим пользователя по email
-    const { data: user, error: userError } = await supabase.value
+    const { data: user, error: userError } = await supabaseAdmin.value
       .from('users')
       .select('*')
       .eq('email', email)
@@ -233,7 +236,7 @@ export function verifyToken(token: string): { userId: string; telegramId?: numbe
 
 export async function getUserById(userId: string): Promise<User | null> {
   try {
-    const { data: user, error } = await supabase.value
+    const { data: user, error } = await supabaseAdmin.value
       .from('users')
       .select('*')
       .eq('id', userId)

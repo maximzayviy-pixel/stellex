@@ -7,6 +7,7 @@ import { useTelegramWebApp } from '@/hooks/useTelegramWebApp'
 import LoadingError from './LoadingError'
 import LoginScreen from './LoginScreen'
 import WebLoginForm from './WebLoginForm'
+import TelegramInstructions from './TelegramInstructions'
 
 interface AuthContextType {
   user: User | null
@@ -24,9 +25,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<string | null>(null)
   const [showLoginScreen, setShowLoginScreen] = useState(false)
   const [showWebLogin, setShowWebLogin] = useState(false)
+  const [showTelegramInstructions, setShowTelegramInstructions] = useState(false)
   
   // Используем хук для Telegram WebApp
-  const { isTelegramWebApp, isReady, user: tgUser } = useTelegramWebApp()
+  const { isTelegramWebApp, isReady, user: tgUser, webApp } = useTelegramWebApp()
 
   useEffect(() => {
     const initializeAuth = async () => {
@@ -50,9 +52,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               // Авторизуемся через Telegram
               await authenticateWithTelegram(tgUser)
             } else {
-              console.log('No Telegram user found, stopping loading')
+              console.log('No Telegram user found, showing web login form')
+              setShowWebLogin(true)
               setLoading(false)
             }
+          } else if (webApp && !isReady) {
+            // Telegram WebApp найден, но initData пустой - показываем инструкции
+            console.log('Telegram WebApp found but initData is empty, showing instructions')
+            setShowTelegramInstructions(true)
+            setLoading(false)
           } else {
             console.log('Not in Telegram Web App, showing web login form')
             setShowWebLogin(true)
@@ -167,19 +175,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setError(null)
     setShowLoginScreen(false)
     setShowWebLogin(false)
+    setShowTelegramInstructions(false)
     setLoading(true)
     // Повторяем инициализацию
     const token = localStorage.getItem('auth_token')
     if (token) {
       validateToken(token)
     } else {
-      if (isTelegramWebApp()) {
-        const tgUser = getTelegramWebAppData()
+      if (isTelegramWebApp && isReady) {
         if (tgUser) {
           authenticateWithTelegram(tgUser)
         } else {
+          setShowWebLogin(true)
           setLoading(false)
         }
+      } else if (webApp && !isReady) {
+        setShowTelegramInstructions(true)
+        setLoading(false)
       } else {
         setShowWebLogin(true)
         setLoading(false)
@@ -249,14 +261,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const handleLinkTelegram = async () => {
     try {
-      if (!isTelegramWebApp()) {
-        setError('Эта функция доступна только в Telegram')
+      if (!isTelegramWebApp || !isReady) {
+        setError('Эта функция доступна только в Telegram WebApp')
         return
       }
 
-      const tgUser = getTelegramWebAppData()
       if (!tgUser) {
-        setError('Не удалось получить данные Telegram')
+        setError('Не удалось получить данные Telegram. Убедитесь, что вы открыли приложение через бота @stellexbank_bot')
         return
       }
 
@@ -265,6 +276,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setError('Необходимо войти в аккаунт')
         return
       }
+
+      console.log('Linking Telegram user:', tgUser)
 
       const response = await fetch('/api/auth/link-telegram', {
         method: 'POST',
@@ -298,6 +311,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Показываем экран входа, если не в Telegram Web App
   if (showLoginScreen) {
     return <LoginScreen onRetry={retryAuth} />
+  }
+
+  // Показываем инструкции по правильному открытию Telegram WebApp
+  if (showTelegramInstructions) {
+    return <TelegramInstructions onRetry={retryAuth} />
   }
 
   // Показываем веб-форму входа/регистрации

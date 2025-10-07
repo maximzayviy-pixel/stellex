@@ -104,6 +104,26 @@ export default function WebLoginForm({ onLogin, onRegister, onLinkTelegram, load
               Создавайте карты, переводите деньги, принимайте платежи.
             </motion.p>
 
+            {/* Предупреждение о правильном открытии */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 }}
+              className="bg-yellow-500/20 border border-yellow-400/30 rounded-xl p-4 max-w-2xl mx-auto mb-8"
+            >
+              <div className="flex items-center justify-center mb-2">
+                <Smartphone className="w-5 h-5 text-yellow-400 mr-2" />
+                <span className="text-yellow-400 font-semibold">Важно!</span>
+              </div>
+              <p className="text-yellow-100 text-sm text-center">
+                Для полного функционала откройте приложение через бота{' '}
+                <a href="https://t.me/stellexbank_bot" target="_blank" rel="noopener noreferrer" className="underline font-semibold">
+                  @stellexbank_bot
+                </a>
+                {' '}в Telegram, а не через прямую ссылку!
+              </p>
+            </motion.div>
+
             {/* Пластиковые карты анонс */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
@@ -142,7 +162,11 @@ export default function WebLoginForm({ onLogin, onRegister, onLinkTelegram, load
                 <ArrowRight className="w-5 h-5" />
               </motion.button>
               <motion.button
-                onClick={() => window.open('https://t.me/stellexbank_bot', '_blank')}
+                onClick={() => {
+                  // Показываем инструкцию для правильного открытия
+                  alert('Для правильной работы откройте приложение через бота @stellexbank_bot:\n\n1. Найдите @stellexbank_bot в Telegram\n2. Нажмите кнопку "Open App" или "Открыть приложение"\n3. Не открывайте ссылку напрямую!')
+                  window.open('https://t.me/stellexbank_bot', '_blank')
+                }}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="px-8 py-4 bg-white/10 text-white font-semibold rounded-lg flex items-center space-x-2 hover:bg-white/20 transition-all border border-white/20"

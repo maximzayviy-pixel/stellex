@@ -47,7 +47,14 @@ git clone <repository-url>
 cd stellex-banking
 ```
 
-2. **Установите зависимости**
+2. **Настройте базу данных Supabase**
+   - Создайте новый проект в [Supabase](https://supabase.com)
+   - Перейдите в SQL Editor
+   - Выполните содержимое файла `supabase-schema-fixed.sql`
+   - Проверьте структуру таблиц с помощью `check-tables.sql`
+   - Скопируйте URL проекта и API ключи
+
+3. **Установите зависимости**
 ```bash
 npm install
 ```
