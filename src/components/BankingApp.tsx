@@ -63,17 +63,18 @@ export default function BankingApp() {
     try {
       setIsLoading(true)
       
-      // Загружаем карты пользователя
-             const { data: cardsData, error: cardsError } = await supabaseAdmin.value
-        .from('cards')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
+      // Загружаем карты пользователя через API
+      const response = await fetch('/api/cards', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+        }
+      })
 
-      if (cardsError) {
-        console.error('Error loading cards:', cardsError)
+      if (response.ok) {
+        const data = await response.json()
+        setCards(data.cards || [])
       } else {
-        setCards(cardsData || [])
+        console.error('Error loading cards:', await response.text())
       }
     } catch (error) {
       console.error('Error loading user data:', error)

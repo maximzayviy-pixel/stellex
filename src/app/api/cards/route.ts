@@ -3,6 +3,55 @@ import { verifyToken } from '@/lib/auth'
 import { createCard } from '@/lib/cardUtils'
 import { supabaseAdmin } from '@/lib/supabase'
 
+export async function GET(request: NextRequest) {
+  try {
+    const authHeader = request.headers.get('authorization')
+
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json(
+        { success: false, error: 'Токен не предоставлен' },
+        { status: 401 }
+      )
+    }
+
+    const token = authHeader.substring(7)
+    const decoded = verifyToken(token)
+
+    if (!decoded) {
+      return NextResponse.json(
+        { success: false, error: 'Неверный токен' },
+        { status: 401 }
+      )
+    }
+
+    // Загружаем карты пользователя
+    const { data: cards, error } = await supabaseAdmin.value
+      .from('cards')
+      .select('*')
+      .eq('user_id', decoded.userId)
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      console.error('Error loading cards:', error)
+      return NextResponse.json(
+        { success: false, error: 'Ошибка загрузки карт' },
+        { status: 500 }
+      )
+    }
+
+    return NextResponse.json({
+      success: true,
+      cards: cards || []
+    })
+  } catch (error) {
+    console.error('Get cards error:', error)
+    return NextResponse.json(
+      { success: false, error: 'Внутренняя ошибка сервера' },
+      { status: 500 }
+    )
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const authHeader = request.headers.get('authorization')
@@ -86,7 +135,7 @@ export async function POST(request: NextRequest) {
       .insert({
         user_id: user_id,
         card_id: card.id,
-        type: 'card_creation',
+        type: 'topup',
         amount: 0,
         description: 'Создание новой карты',
         status: 'completed'
@@ -102,55 +151,6 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     console.error('Create card error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Внутренняя ошибка сервера' },
-      { status: 500 }
-    )
-  }
-}
-
-export async function GET(request: NextRequest) {
-  try {
-    const authHeader = request.headers.get('authorization')
-
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json(
-        { success: false, error: 'Токен не предоставлен' },
-        { status: 401 }
-      )
-    }
-
-    const token = authHeader.substring(7)
-    const decoded = verifyToken(token)
-
-    if (!decoded) {
-      return NextResponse.json(
-        { success: false, error: 'Неверный токен' },
-        { status: 401 }
-      )
-    }
-
-    // Получаем карты пользователя
-    const { data: cards, error } = await supabaseAdmin.value
-      .from('cards')
-      .select('*')
-      .eq('user_id', decoded.userId)
-      .order('created_at', { ascending: false })
-
-    if (error) {
-      console.error('Get cards error:', error)
-      return NextResponse.json(
-        { success: false, error: 'Ошибка получения карт' },
-        { status: 500 }
-      )
-    }
-
-    return NextResponse.json({
-      success: true,
-      cards: cards || []
-    })
-  } catch (error) {
-    console.error('Get cards error:', error)
     return NextResponse.json(
       { success: false, error: 'Внутренняя ошибка сервера' },
       { status: 500 }

@@ -15,8 +15,17 @@ export async function POST(request: NextRequest) {
 
     const decodedToken = verifyToken(token)
 
-    if (!decodedToken || decodedToken.role !== 'admin') {
-      return NextResponse.json({ success: false, error: 'Admin access required' }, { status: 403 })
+    console.log('Decoded token:', decodedToken)
+
+    if (!decodedToken) {
+      return NextResponse.json({ success: false, error: 'Invalid token' }, { status: 401 })
+    }
+
+    if (decodedToken.role !== 'admin') {
+      return NextResponse.json({ 
+        success: false, 
+        error: `Admin access required. Current role: ${decodedToken.role}` 
+      }, { status: 403 })
     }
 
     const { email, password, firstName, lastName, role } = await request.json()
