@@ -55,7 +55,7 @@ export default function BankingApp() {
       setIsLoading(true)
       
       // Загружаем карты пользователя
-      const { data: cardsData, error: cardsError } = await supabaseAdmin
+             const { data: cardsData, error: cardsError } = await supabaseAdmin.value
         .from('cards')
         .select('*')
         .eq('user_id', user.id)

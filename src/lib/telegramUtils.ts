@@ -1,16 +1,26 @@
 import { TelegramWebAppUser } from '@/types'
 
 export function getTelegramWebAppData(): TelegramWebAppUser | null {
-  if (typeof window === 'undefined') return null
+  if (typeof window === 'undefined') {
+    console.log('Window is undefined (server-side)')
+    return null
+  }
   
   // Проверяем, что мы в Telegram Web App
-  if (!window.Telegram?.WebApp) return null
+  if (!window.Telegram?.WebApp) {
+    console.log('Telegram WebApp not available')
+    return null
+  }
   
   const tg = window.Telegram.WebApp
   const user = tg.initDataUnsafe?.user
   
-  if (!user) return null
+  if (!user) {
+    console.log('No user data in Telegram WebApp')
+    return null
+  }
   
+  console.log('Telegram user data found:', user)
   return {
     id: user.id,
     first_name: user.first_name,
@@ -19,6 +29,13 @@ export function getTelegramWebAppData(): TelegramWebAppUser | null {
     language_code: user.language_code,
     is_premium: user.is_premium
   }
+}
+
+export function isTelegramWebApp(): boolean {
+  return typeof window !== 'undefined' && 
+         window.Telegram && 
+         window.Telegram.WebApp &&
+         window.Telegram.WebApp.initDataUnsafe
 }
 
 export function showTelegramAlert(message: string): void {

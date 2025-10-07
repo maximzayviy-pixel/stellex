@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { User } from '@/types'
-import { getTelegramWebAppData } from '@/lib/telegramUtils'
+import { getTelegramWebAppData, isTelegramWebApp } from '@/lib/telegramUtils'
 import LoadingError from './LoadingError'
 
 interface AuthContextType {
@@ -32,14 +32,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           await validateToken(token)
         } else {
           console.log('No token found, checking Telegram Web App...')
-          // Пытаемся получить данные из Telegram Web App
-          const tgUser = getTelegramWebAppData()
-          if (tgUser) {
-            console.log('Telegram user found, authenticating...', tgUser)
-            // Авторизуемся через Telegram
-            await authenticateWithTelegram(tgUser)
+          // Проверяем, что мы в Telegram Web App
+          if (isTelegramWebApp()) {
+            console.log('In Telegram Web App, getting user data...')
+            // Пытаемся получить данные из Telegram Web App
+            const tgUser = getTelegramWebAppData()
+            if (tgUser) {
+              console.log('Telegram user found, authenticating...', tgUser)
+              // Авторизуемся через Telegram
+              await authenticateWithTelegram(tgUser)
+            } else {
+              console.log('No Telegram user found, stopping loading')
+              setLoading(false)
+            }
           } else {
-            console.log('No Telegram user found, stopping loading')
+            console.log('Not in Telegram Web App, stopping loading')
             setLoading(false)
           }
         }

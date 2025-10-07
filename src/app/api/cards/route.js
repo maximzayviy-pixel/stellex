@@ -43,7 +43,7 @@ export async function POST(request) {
     }
 
     // Проверяем лимит карт (максимум 3)
-    const { data: existingCards, error: countError } = await supabaseAdmin
+          const { data: existingCards, error: countError } = await supabaseAdmin.value.value
       .from('cards')
       .select('id')
       .eq('user_id', user_id)
@@ -66,7 +66,7 @@ export async function POST(request) {
     const newCard = createCard(user_id, holder_name)
 
     // Сохраняем в базу данных
-    const { data: card, error: insertError } = await supabaseAdmin
+    const { data: card, error: insertError } = await supabaseAdmin.value.value
       .from('cards')
       .insert([newCard])
       .select()
@@ -81,7 +81,7 @@ export async function POST(request) {
     }
 
     // Создаем транзакцию создания карты
-    const { error: transactionError } = await supabaseAdmin
+    const { error: transactionError } = await supabaseAdmin.value.value
       .from('transactions')
       .insert({
         user_id: user_id,
@@ -131,7 +131,7 @@ export async function GET(request) {
     }
 
     // Получаем карты пользователя
-    const { data: cards, error } = await supabaseAdmin
+    const { data: cards, error } = await supabaseAdmin.value.value
       .from('cards')
       .select('*')
       .eq('user_id', decoded.userId)
