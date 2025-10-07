@@ -72,6 +72,8 @@ JWT_SECRET=your_jwt_secret
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
+> 📋 **Для Vercel**: См. подробную инструкцию в [VERCEL_SETUP.md](./VERCEL_SETUP.md)
+
 4. **Настройте базу данных**
 Выполните SQL скрипт из `supabase-schema.sql` в вашей базе данных Supabase.
 
