@@ -222,7 +222,11 @@ export default function BankingApp() {
 
   const showNotification = (message: string) => {
     // Простое уведомление через alert, можно заменить на toast
-    alert(message)
+    try {
+      alert(message)
+    } catch (error) {
+      console.error('Notification error:', error)
+    }
   }
 
   if (!user) {

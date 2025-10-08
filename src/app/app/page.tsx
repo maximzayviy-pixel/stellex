@@ -3,12 +3,15 @@
 import React from 'react'
 import { AuthProvider } from '@/components/AuthProvider'
 import BankingApp from '@/components/BankingApp'
+import ErrorBoundary from '@/components/ErrorBoundary'
 
 export default function AppPage() {
   return (
-    <AuthProvider>
-      <BankingApp />
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <BankingApp />
+      </AuthProvider>
+    </ErrorBoundary>
   )
 }
 
