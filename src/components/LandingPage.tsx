@@ -22,7 +22,6 @@ import {
   Key,
   Send
 } from 'lucide-react'
-import PlasticCard3D from './PlasticCard3D'
 import ApiKeyRequestModal from './ApiKeyRequestModal'
 
 export default function LandingPage() {
@@ -272,7 +271,14 @@ export default function LandingPage() {
                 transition={{ duration: 1, delay: 1 }}
                 className="relative"
               >
-                <PlasticCard3D />
+                {/* Заглушка для 3D карты */}
+                <div className="w-80 h-48 bg-gradient-to-br from-purple-600 via-pink-600 to-purple-800 rounded-2xl shadow-2xl flex items-center justify-center">
+                  <div className="text-white text-center">
+                    <CreditCard className="w-16 h-16 mx-auto mb-2" />
+                    <p className="text-lg font-semibold">Stellex Pay</p>
+                    <p className="text-sm opacity-80">6666 **** **** 1234</p>
+                  </div>
+                </div>
                 {/* Премиальные эффекты вокруг карты */}
                 <div className="absolute -inset-8 bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-purple-500/10 rounded-3xl blur-2xl"></div>
                 <div className="absolute -inset-4 bg-gradient-to-r from-white/5 via-transparent to-white/5 rounded-2xl blur-xl"></div>

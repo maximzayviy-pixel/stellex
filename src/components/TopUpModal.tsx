@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
-import { X, CreditCard, Star, ArrowRight } from 'lucide-react'
+import { X, CreditCard, Star, ArrowRight, Wallet } from 'lucide-react'
 import { Card, TopUpData } from '@/types'
 import { vibrate } from '@/lib/vibration'
 
@@ -14,7 +14,7 @@ interface TopUpModalProps {
 
 export default function TopUpModal({ card, onClose, onTopUp }: TopUpModalProps) {
   const [amount, setAmount] = useState('')
-  const [paymentMethod, setPaymentMethod] = useState<'telegram' | 'card'>('telegram')
+  const [paymentMethod, setPaymentMethod] = useState<'telegram' | 'card' | 'ton'>('telegram')
   const [isLoading, setIsLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -33,6 +33,12 @@ export default function TopUpModal({ card, onClose, onTopUp }: TopUpModalProps) 
         await onTopUp({
           cardId: card.id,
           starsAmount: parseFloat(amount)
+        })
+      } else if (paymentMethod === 'ton') {
+        // Для TON передаем starsAmount (конвертированное)
+        await onTopUp({
+          cardId: card.id,
+          starsAmount: parseFloat(amount) * 100 // 1 TON = 100 Stars
         })
       } else {
         // Для банковской карты передаем amount
@@ -176,9 +182,38 @@ export default function TopUpModal({ card, onClose, onTopUp }: TopUpModalProps) 
                   <input
                     type="radio"
                     name="paymentMethod"
+                    value="ton"
+                    checked={paymentMethod === 'ton'}
+                    onChange={(e) => setPaymentMethod(e.target.value as 'telegram' | 'card' | 'ton')}
+                    className="sr-only"
+                  />
+                  <div className={`w-5 h-5 rounded-full border-2 mr-3 flex items-center justify-center ${
+                    paymentMethod === 'ton' 
+                      ? 'border-purple-500 bg-purple-500' 
+                      : 'border-gray-300'
+                  }`}>
+                    {paymentMethod === 'ton' && (
+                      <div className="w-2 h-2 bg-white rounded-full"></div>
+                    )}
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <Wallet className="w-5 h-5 text-purple-500" />
+                    <div>
+                      <div className="font-medium">TON Кошелек</div>
+                      <div className="text-sm text-gray-500">
+                        Пополнить через TON Blockchain
+                      </div>
+                    </div>
+                  </div>
+                </label>
+
+                <label className="flex items-center p-4 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors">
+                  <input
+                    type="radio"
+                    name="paymentMethod"
                     value="card"
                     checked={paymentMethod === 'card'}
-                    onChange={(e) => setPaymentMethod(e.target.value as 'telegram' | 'card')}
+                    onChange={(e) => setPaymentMethod(e.target.value as 'telegram' | 'card' | 'ton')}
                     className="sr-only"
                   />
                   <div className={`w-5 h-5 rounded-full border-2 mr-3 flex items-center justify-center ${

@@ -14,7 +14,8 @@ import {
   Bell,
   MessageSquare,
   MoreVertical,
-  ChevronDown
+  ChevronDown,
+  Wallet
 } from 'lucide-react'
 import { Card, User } from '@/types'
 import { vibrate, vibrationPatterns, initVibration } from '@/lib/vibration'
@@ -28,6 +29,7 @@ interface HomePageProps {
   onQRCode: () => void
   onScan: () => void
   onCardClick: (card: Card) => void
+  onTonWallet: () => void
   showNotification: (message: string) => void
 }
 
@@ -37,10 +39,11 @@ export default function HomePage({
   onCreateCard, 
   onTopUp, 
   onTransfer, 
-  onQRCode, 
-  onScan, 
+  onQRCode,
+  onScan,
   onCardClick,
-  showNotification 
+  onTonWallet,
+  showNotification
 }: HomePageProps) {
   const [searchQuery, setSearchQuery] = useState('')
 
@@ -253,6 +256,16 @@ export default function HomePage({
                   >
                     <Scan className="w-4 h-4 mx-auto mb-1" />
                     <span className="text-xs font-medium">Сканировать</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      vibrate('tap')
+                      onTonWallet()
+                    }}
+                    className="py-2 px-1 bg-white/20 rounded-lg hover:bg-white/30 transition-colors text-center"
+                  >
+                    <Wallet className="w-4 h-4 mx-auto mb-1" />
+                    <span className="text-xs font-medium">TON</span>
                   </button>
                 </div>
               </motion.div>

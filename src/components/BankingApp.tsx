@@ -37,6 +37,7 @@ import SettingsPage from './SettingsPage'
 import UserTicketsModal from './UserTicketsModal'
 import HomePage from './HomePage'
 import CosmicPreloader from './CosmicPreloader'
+import TonWalletModal from './TonWalletModal'
 
 export default function BankingApp() {
   const { user, logout } = useAuth()
@@ -56,6 +57,7 @@ export default function BankingApp() {
   const [showCardDetailsModal, setShowCardDetailsModal] = useState(false)
   const [showTickets, setShowTickets] = useState(false)
   const [showPreloader, setShowPreloader] = useState(false)
+  const [showTonWallet, setShowTonWallet] = useState(false)
   const [currentUser, setCurrentUser] = useState(user)
 
   // Загружаем данные пользователя и карты
@@ -184,7 +186,7 @@ export default function BankingApp() {
   }
 
   const handleTelegramStarsTopUp = async (data: { cardId: string; starsAmount: number }) => {
-    vibrate(vibrationPatterns.tap)
+    vibrate('tap')
     try {
       const response = await fetch('/api/telegram-stars/topup', {
         method: 'POST',
@@ -209,6 +211,39 @@ export default function BankingApp() {
       console.error('Telegram Stars top-up error:', error)
       vibrate('error')
       showNotification('Ошибка пополнения')
+    }
+  }
+
+  const handleTonTopUp = async (amount: number) => {
+    vibrate('tap')
+    try {
+      // Пополняем первую карту пользователя
+      const firstCard = cards[0]
+      if (!firstCard) {
+        showNotification('У вас нет карт для пополнения')
+        return
+      }
+
+      await handleTelegramStarsTopUp({
+        cardId: firstCard.id,
+        starsAmount: amount
+      })
+    } catch (error) {
+      console.error('TON top up error:', error)
+      vibrate('error')
+      showNotification('Ошибка пополнения через TON')
+    }
+  }
+
+  const handleTonWithdraw = async (amount: number, address: string) => {
+    vibrate('tap')
+    try {
+      // Здесь должна быть логика вывода средств через TON
+      showNotification(`Вывод ${amount} TON на адрес ${address} выполнен!`)
+    } catch (error) {
+      console.error('TON withdraw error:', error)
+      vibrate('error')
+      showNotification('Ошибка вывода через TON')
     }
   }
 
@@ -283,6 +318,7 @@ export default function BankingApp() {
           onQRCode={() => setShowQRCodeModal(true)}
           onScan={() => setShowQRCodeModal(true)}
           onCardClick={handleCardExpand}
+          onTonWallet={() => setShowTonWallet(true)}
           showNotification={showNotification}
         />
       )}
@@ -421,6 +457,18 @@ export default function BankingApp() {
               vibrate('tap')
               setShowTickets(false)
             }}
+          />
+        )}
+
+        {showTonWallet && (
+          <TonWalletModal
+            isOpen={showTonWallet}
+            onClose={() => {
+              vibrate('tap')
+              setShowTonWallet(false)
+            }}
+            onTopUp={handleTonTopUp}
+            onWithdraw={handleTonWithdraw}
           />
         )}
       </AnimatePresence>

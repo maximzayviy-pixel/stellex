@@ -20,8 +20,8 @@ import {
   Menu,
   X
 } from 'lucide-react'
-import AppRouter from '../components/AppRouter'
+import LandingPage from '../components/LandingPage'
 
-export default function LandingPage() {
-  return <AppRouter />
+export default function HomePage() {
+  return <LandingPage />
 }

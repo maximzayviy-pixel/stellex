@@ -2,12 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { User } from '@/types'
-import { getTelegramWebAppData, isTelegramWebApp, waitForTelegramWebApp } from '@/lib/telegramUtils'
 import { useTelegramWebApp } from '@/hooks/useTelegramWebApp'
-import LoadingError from './LoadingError'
-import LoginScreen from './LoginScreen'
-import WebLoginForm from './WebLoginForm'
-import TelegramInstructions from './TelegramInstructions'
 
 interface AuthContextType {
   user: User | null
@@ -304,29 +299,73 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Показываем ошибку, если она есть
   if (error) {
-    return <LoadingError message={error} onRetry={retryAuth} />
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Ошибка загрузки</h2>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <button
+            onClick={retryAuth}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            Попробовать снова
+          </button>
+        </div>
+      </div>
+    )
   }
 
   // Показываем экран входа, если не в Telegram Web App
   if (showLoginScreen) {
-    return <LoginScreen onRetry={retryAuth} />
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Вход в систему</h2>
+          <p className="text-gray-600 mb-4">Откройте приложение через Telegram</p>
+          <button
+            onClick={retryAuth}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            Обновить
+          </button>
+        </div>
+      </div>
+    )
   }
 
   // Показываем инструкции по правильному открытию Telegram WebApp
   if (showTelegramInstructions) {
-    return <TelegramInstructions onRetry={retryAuth} />
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Откройте через Telegram</h2>
+          <p className="text-gray-600 mb-4">Это приложение работает только в Telegram</p>
+          <button
+            onClick={retryAuth}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            Обновить
+          </button>
+        </div>
+      </div>
+    )
   }
 
   // Показываем веб-форму входа/регистрации
   if (showWebLogin) {
     return (
-      <WebLoginForm
-        onLogin={handleWebLogin}
-        onRegister={handleWebRegister}
-        onLinkTelegram={handleLinkTelegram}
-        loading={loading}
-        error={error}
-      />
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Веб-версия</h2>
+          <p className="text-gray-600 mb-4">Веб-версия в разработке</p>
+          <button
+            onClick={() => setShowWebLogin(false)}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            Назад
+          </button>
+        </div>
+      </div>
     )
   }
 
