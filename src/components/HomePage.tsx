@@ -89,42 +89,9 @@ export default function HomePage({
               {getGreeting()}
             </p>
           </div>
-          <div className="flex items-center space-x-2">
-            {/* Тестовые кнопки вибрации */}
-            <button 
-              onClick={() => {
-                console.log('Testing tap vibration...')
-                vibrate('tap')
-              }}
-              className="p-2 rounded-xl bg-green-500/20 hover:bg-green-500/30 transition-colors"
-              title="Тест tap"
-            >
-              📳
-            </button>
-            <button 
-              onClick={() => {
-                console.log('Testing success vibration...')
-                vibrate('success')
-              }}
-              className="p-2 rounded-xl bg-blue-500/20 hover:bg-blue-500/30 transition-colors"
-              title="Тест success"
-            >
-              ✅
-            </button>
-            <button 
-              onClick={() => {
-                console.log('Testing error vibration...')
-                vibrate('error')
-              }}
-              className="p-2 rounded-xl bg-red-500/20 hover:bg-red-500/30 transition-colors"
-              title="Тест error"
-            >
-              ❌
-            </button>
-            <button className="p-2 rounded-xl bg-white/10 hover:bg-white/20 transition-colors">
-              <MoreVertical className="w-5 h-5 text-white" />
-            </button>
-          </div>
+          <button className="p-2 rounded-xl bg-white/10 hover:bg-white/20 transition-colors">
+            <MoreVertical className="w-5 h-5 text-white" />
+          </button>
         </div>
       </div>
 

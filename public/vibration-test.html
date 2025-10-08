@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест вибрации</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 30px;
+        }
+        .button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .button:hover {
+            transform: scale(1.05);
+        }
+        .tap { background: #4CAF50; }
+        .success { background: #2196F3; }
+        .error { background: #f44336; }
+        .warning { background: #ff9800; }
+        .selection { background: #9c27b0; }
+        .info {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            background: rgba(255,255,255,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔊 Тест вибрации</h1>
+        
+        <div class="info">
+            <h3>Информация о браузере:</h3>
+            <div class="status" id="browser-info"></div>
+            <div class="status" id="vibration-support"></div>
+        </div>
+
+        <button class="button tap" onclick="testVibration('tap')">
+            📳 Tap (50ms)
+        </button>
+        
+        <button class="button success" onclick="testVibration('success')">
+            ✅ Success (100-50-100ms)
+        </button>
+        
+        <button class="button error" onclick="testVibration('error')">
+            ❌ Error (200-100-200ms)
+        </button>
+        
+        <button class="button warning" onclick="testVibration('warning')">
+            ⚠️ Warning (100-50-100-50-100ms)
+        </button>
+        
+        <button class="button selection" onclick="testVibration('selection')">
+            🎯 Selection (30ms)
+        </button>
+
+        <div class="info">
+            <h3>Результаты тестов:</h3>
+            <div id="results"></div>
+        </div>
+    </div>
+
+    <script>
+        // Проверяем поддержку вибрации при загрузке
+        window.onload = function() {
+            const browserInfo = document.getElementById('browser-info');
+            const vibrationSupport = document.getElementById('vibration-support');
+            
+            browserInfo.innerHTML = `
+                <strong>User Agent:</strong> ${navigator.userAgent}<br>
+                <strong>Platform:</strong> ${navigator.platform}<br>
+                <strong>Vibrate API:</strong> ${'vibrate' in navigator ? '✅ Поддерживается' : '❌ Не поддерживается'}
+            `;
+            
+            if ('vibrate' in navigator) {
+                vibrationSupport.innerHTML = '🎉 Вибрация должна работать!';
+                vibrationSupport.style.background = 'rgba(76, 175, 80, 0.3)';
+            } else {
+                vibrationSupport.innerHTML = '❌ Вибрация не поддерживается в этом браузере';
+                vibrationSupport.style.background = 'rgba(244, 67, 54, 0.3)';
+            }
+        };
+
+        function testVibration(type) {
+            const results = document.getElementById('results');
+            const timestamp = new Date().toLocaleTimeString();
+            
+            console.log(`🔊 Testing vibration: ${type}`);
+            
+            if (!('vibrate' in navigator)) {
+                results.innerHTML += `<div class="status">❌ ${timestamp}: Vibration API не поддерживается</div>`;
+                return;
+            }
+
+            const patterns = {
+                tap: 50,
+                success: [100, 50, 100],
+                error: [200, 100, 200],
+                warning: [100, 50, 100, 50, 100],
+                selection: 30
+            };
+
+            const pattern = patterns[type];
+            
+            try {
+                const result = navigator.vibrate(pattern);
+                console.log(`📳 Vibration result: ${result}`);
+                
+                if (result === false) {
+                    results.innerHTML += `<div class="status">❌ ${timestamp}: ${type} - Вибрация заблокирована браузером</div>`;
+                } else {
+                    results.innerHTML += `<div class="status">✅ ${timestamp}: ${type} - Вибрация отправлена (${JSON.stringify(pattern)})</div>`;
+                }
+            } catch (error) {
+                console.error('Vibration error:', error);
+                results.innerHTML += `<div class="status">❌ ${timestamp}: ${type} - Ошибка: ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

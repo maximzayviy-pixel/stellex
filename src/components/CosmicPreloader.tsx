@@ -10,7 +10,7 @@ interface CosmicPreloaderProps {
 }
 
 export default function CosmicPreloader({ user, onComplete }: CosmicPreloaderProps) {
-  const [step, setStep] = useState<'loading' | 'pin-setup' | 'pin-enter'>('loading')
+  const [step, setStep] = useState<'loading' | 'pin-setup'>('loading')
   const [pin, setPin] = useState('')
   const [confirmPin, setConfirmPin] = useState('')
   const [pinError, setPinError] = useState('')
@@ -33,26 +33,17 @@ export default function CosmicPreloader({ user, onComplete }: CosmicPreloaderPro
   }, [])
 
   const handlePinSubmit = () => {
-    if (step === 'pin-setup') {
-      if (pin.length !== 4) {
-        setPinError('PIN должен содержать 4 цифры')
-        return
-      }
-      if (pin !== confirmPin) {
-        setPinError('PIN-коды не совпадают')
-        return
-      }
-      // Сохраняем PIN в localStorage
-      localStorage.setItem('user_pin', pin)
-      setStep('pin-enter')
-    } else {
-      const savedPin = localStorage.getItem('user_pin')
-      if (pin !== savedPin) {
-        setPinError('Неверный PIN-код')
-        return
-      }
-      onComplete()
+    if (pin.length !== 4) {
+      setPinError('PIN должен содержать 4 цифры')
+      return
     }
+    if (pin !== confirmPin) {
+      setPinError('PIN-коды не совпадают')
+      return
+    }
+    // Сохраняем PIN в localStorage и завершаем
+    localStorage.setItem('user_pin', pin)
+    onComplete()
   }
 
   const handlePinChange = (value: string) => {
@@ -244,57 +235,6 @@ export default function CosmicPreloader({ user, onComplete }: CosmicPreloaderPro
           </motion.div>
         )}
 
-        {step === 'pin-enter' && (
-          <motion.div
-            key="pin-enter"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="w-full max-w-md mx-auto px-6 z-10"
-          >
-            <div className="text-center mb-8">
-              <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-                <span className="text-2xl">🔐</span>
-              </div>
-              <h2 className="text-2xl font-bold text-white mb-2">Введите PIN-код</h2>
-              <p className="text-white/70">Для входа в аккаунт</p>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <input
-                  type="password"
-                  value={pin}
-                  onChange={(e) => handlePinChange(e.target.value)}
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white text-center text-2xl tracking-widest focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  maxLength={4}
-                  placeholder="••••"
-                  autoFocus
-                />
-              </div>
-
-              {pinError && (
-                <motion.p
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-red-400 text-sm text-center"
-                >
-                  {pinError}
-                </motion.p>
-              )}
-
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={handlePinSubmit}
-                disabled={pin.length !== 4}
-                className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Войти
-              </motion.button>
-            </div>
-          </motion.div>
-        )}
       </AnimatePresence>
     </div>
   )

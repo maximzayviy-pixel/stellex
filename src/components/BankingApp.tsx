@@ -67,21 +67,12 @@ export default function BankingApp() {
       if (!savedPin) {
         setShowPreloader(true)
       } else {
+        setShowPreloader(false)
         loadUserData()
       }
     }
     // Инициализируем вибрацию при загрузке компонента
     initVibration()
-  }, [user])
-
-  // Проверяем PIN-код при загрузке
-  useEffect(() => {
-    if (user) {
-      const savedPin = localStorage.getItem('user_pin')
-      if (savedPin) {
-        setShowPreloader(false)
-      }
-    }
   }, [user])
 
   const loadUserData = async () => {

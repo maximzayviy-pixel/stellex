@@ -1,81 +1,49 @@
-import { initHapticFeedback } from '@telegram-apps/sdk'
+// Простая и надежная система вибрации
+export const vibrate = (type: 'tap' | 'success' | 'error' | 'warning' | 'selection' = 'tap') => {
+  console.log('🔊 VIBRATE CALLED:', type)
+  
+  // Проверяем поддержку вибрации
+  if (typeof window === 'undefined') {
+    console.log('❌ Window is undefined (SSR)')
+    return
+  }
 
-// Инициализируем Telegram Haptic Feedback
-let hapticFeedback: any = null
+  if (!('vibrate' in navigator)) {
+    console.log('❌ Vibration API not supported in this browser')
+    return
+  }
 
-// Инициализация вибрации
-export const initVibration = () => {
+  // Паттерны вибрации
+  const patterns = {
+    tap: 50,
+    success: [100, 50, 100],
+    error: [200, 100, 200],
+    warning: [100, 50, 100, 50, 100],
+    selection: 30
+  }
+
+  const pattern = patterns[type]
+  console.log('📳 Vibration pattern:', pattern)
+
   try {
-    hapticFeedback = initHapticFeedback()
-    console.log('Telegram Haptic Feedback initialized')
+    // Пробуем вибрацию
+    const result = navigator.vibrate(pattern)
+    console.log('✅ Vibration result:', result)
+    
+    // Дополнительная проверка
+    if (result === false) {
+      console.log('❌ Vibration was blocked by browser')
+    } else {
+      console.log('🎉 Vibration should be working!')
+    }
   } catch (error) {
-    console.warn('Failed to initialize Telegram Haptic Feedback:', error)
-    hapticFeedback = null
+    console.error('❌ Vibration error:', error)
   }
 }
 
-// Виброотклик для Telegram Mini Apps
-export const vibrate = (type: 'tap' | 'success' | 'error' | 'warning' | 'selection' = 'tap') => {
-  console.log('Vibrate called with type:', type)
-  
-  // Пробуем инициализировать вибрацию если еще не инициализирована
-  if (!hapticFeedback) {
-    try {
-      hapticFeedback = initHapticFeedback()
-      console.log('Telegram Haptic Feedback initialized on demand')
-    } catch (error) {
-      console.warn('Failed to initialize Telegram Haptic Feedback on demand:', error)
-      hapticFeedback = null
-    }
-  }
-  
-  // Сначала пробуем Telegram Haptic Feedback
-  if (hapticFeedback) {
-    try {
-      switch (type) {
-        case 'tap':
-          hapticFeedback.impactOccurred('light')
-          break
-        case 'success':
-          hapticFeedback.notificationOccurred('success')
-          break
-        case 'error':
-          hapticFeedback.notificationOccurred('error')
-          break
-        case 'warning':
-          hapticFeedback.notificationOccurred('warning')
-          break
-        case 'selection':
-          hapticFeedback.selectionChanged()
-          break
-        default:
-          hapticFeedback.impactOccurred('light')
-      }
-      console.log('Telegram haptic feedback triggered:', type)
-      return
-    } catch (error) {
-      console.warn('Telegram haptic feedback failed:', error)
-    }
-  }
-
-  // Fallback на стандартную вибрацию браузера
-  if (typeof window !== 'undefined' && 'vibrate' in navigator) {
-    try {
-      const patterns = {
-        tap: 50,
-        success: [100, 50, 100],
-        error: [200, 100, 200],
-        warning: [100, 50, 100, 50, 100],
-        selection: 30
-      }
-      navigator.vibrate(patterns[type])
-      console.log('Fallback vibration triggered:', type, patterns[type])
-    } catch (error) {
-      console.warn('Fallback vibration not supported:', error)
-    }
-  } else {
-    console.log('Vibration not available - not in mobile browser or not supported')
-  }
+// Инициализация (пустая функция для совместимости)
+export const initVibration = () => {
+  console.log('🔧 Vibration system initialized')
 }
 
 // Предустановленные паттерны вибрации (для совместимости)
