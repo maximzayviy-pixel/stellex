@@ -33,9 +33,9 @@ export default function SettingsPage({ user, onBack, onUpdateUser }: SettingsPag
   
   // Profile settings
   const [profileData, setProfileData] = useState({
-    first_name: user.first_name || '',
-    last_name: user.last_name || '',
-    email: user.email || ''
+    first_name: user?.first_name || '',
+    last_name: user?.last_name || '',
+    email: user?.email || ''
   })
 
   // Security settings

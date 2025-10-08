@@ -142,7 +142,7 @@ export default function CosmicPreloader({ user, onComplete }: CosmicPreloaderPro
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
             >
-              {user.first_name} {user.last_name || ''}
+              {user?.first_name || 'Пользователь'} {user?.last_name || ''}
             </motion.h1>
 
             {/* Прогресс бар */}

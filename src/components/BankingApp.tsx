@@ -105,7 +105,10 @@ export default function BankingApp() {
   }
 
   const handleCreateCard = async () => {
-    if (!user) return
+    if (!user || !user.id) {
+      showNotification('Ошибка: пользователь не найден')
+      return
+    }
 
     // Проверяем лимит карт (максимум 3)
     if (cards.length >= 3) {
@@ -124,7 +127,7 @@ export default function BankingApp() {
         },
         body: JSON.stringify({
           user_id: user.id,
-          holder_name: `${user.first_name} ${user.last_name || ''}`.trim() || 'ПОЛЬЗОВАТЕЛЬ'
+          holder_name: `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'ПОЛЬЗОВАТЕЛЬ'
         })
       })
 

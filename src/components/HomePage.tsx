@@ -82,7 +82,7 @@ export default function HomePage({
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-white">
-              {user.first_name?.toUpperCase()},
+              {user?.first_name?.toUpperCase() || 'ПОЛЬЗОВАТЕЛЬ'},
             </h1>
             <p className="text-white/80 text-lg">
               {getGreeting()}

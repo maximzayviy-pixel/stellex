@@ -470,7 +470,7 @@ export default function AdminDashboard() {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div>
                             <div className="text-sm font-medium text-white">
-                              {user.first_name} {user.last_name}
+                              {user?.first_name || 'N/A'} {user?.last_name || ''}
                             </div>
                             <div className="text-sm text-white/50">{user.email}</div>
                           </div>
