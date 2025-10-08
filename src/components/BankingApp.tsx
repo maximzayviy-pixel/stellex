@@ -62,19 +62,23 @@ export default function BankingApp() {
 
   // Загружаем данные пользователя и карты
   useEffect(() => {
-    if (user) {
-      setCurrentUser(user)
-      // Проверяем, есть ли PIN-код
-      const savedPin = localStorage.getItem('user_pin')
-      if (!savedPin) {
-        setShowPreloader(true)
-      } else {
-        setShowPreloader(false)
-        loadUserData()
+    try {
+      if (user) {
+        setCurrentUser(user)
+        // Проверяем, есть ли PIN-код
+        const savedPin = localStorage.getItem('user_pin')
+        if (!savedPin) {
+          setShowPreloader(true)
+        } else {
+          setShowPreloader(false)
+          loadUserData()
+        }
       }
+      // Инициализируем вибрацию при загрузке компонента
+      initVibration()
+    } catch (error) {
+      console.error('Error in BankingApp useEffect:', error)
     }
-    // Инициализируем вибрацию при загрузке компонента
-    initVibration()
   }, [user])
 
   const loadUserData = async () => {
@@ -83,10 +87,17 @@ export default function BankingApp() {
     try {
       setIsLoading(true)
       
+      // Проверяем наличие токена
+      const token = localStorage.getItem('auth_token')
+      if (!token) {
+        console.error('No auth token found')
+        return
+      }
+      
       // Загружаем карты пользователя через API
       const response = await fetch('/api/cards', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          'Authorization': `Bearer ${token}`
         }
       })
 
@@ -95,7 +106,12 @@ export default function BankingApp() {
         console.log('Loaded cards:', data.cards)
         setCards(data.cards || [])
       } else {
-        console.error('Error loading cards:', await response.text())
+        const errorText = await response.text()
+        console.error('Error loading cards:', errorText)
+        // Если ошибка авторизации, выходим из системы
+        if (response.status === 401) {
+          logout()
+        }
       }
     } catch (error) {
       console.error('Error loading user data:', error)

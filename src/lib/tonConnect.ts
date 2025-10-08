@@ -1,5 +1,6 @@
-import { TonConnect } from '@tonconnect/sdk'
-import { TonConnectUI } from '@tonconnect/ui'
+// Безопасная инициализация TON Connect
+let tonConnect: any = null
+let tonConnectUI: any = null
 
 // Конфигурация TON Connect
 const manifestUrl = 'https://stellex.space/tonconnect-manifest.json'
@@ -7,27 +8,52 @@ const manifestUrl = 'https://stellex.space/tonconnect-manifest.json'
 // Проверяем, что мы в браузере
 const isBrowser = typeof window !== 'undefined'
 
-// Создаем экземпляр TonConnect только в браузере
-export const tonConnect = isBrowser ? new TonConnect({
-  manifestUrl
-}) : null
+// Безопасная инициализация TON Connect
+const initTonConnectSDK = () => {
+  if (!isBrowser) return { tonConnect: null, tonConnectUI: null }
+  
+  try {
+    // Динамический импорт для избежания SSR проблем
+    const { TonConnect } = require('@tonconnect/sdk')
+    const { TonConnectUI } = require('@tonconnect/ui')
+    
+    tonConnect = new TonConnect({
+      manifestUrl
+    })
+    
+    tonConnectUI = new TonConnectUI({
+      manifestUrl,
+      buttonRootId: 'ton-connect-button',
+      language: 'ru'
+    })
+    
+    return { tonConnect, tonConnectUI }
+  } catch (error) {
+    console.error('TON Connect initialization error:', error)
+    return { tonConnect: null, tonConnectUI: null }
+  }
+}
 
-// Создаем UI для TonConnect только в браузере
-export const tonConnectUI = isBrowser ? new TonConnectUI({
-  manifestUrl,
-  buttonRootId: 'ton-connect-button',
-  language: 'ru'
-}) : null
+// Инициализируем при первом вызове
+const { tonConnect: _tonConnect, tonConnectUI: _tonConnectUI } = initTonConnectSDK()
+
+export { _tonConnect as tonConnect, _tonConnectUI as tonConnectUI }
 
 // Инициализация TON Connect
 export const initTonConnect = async () => {
-  if (!isBrowser || !tonConnectUI) {
+  if (!isBrowser) {
     console.log('❌ TON Connect not available in SSR')
     return false
   }
   
   try {
-    await tonConnectUI.init()
+    const { tonConnectUI: ui } = initTonConnectSDK()
+    if (!ui) {
+      console.log('❌ TON Connect UI not available')
+      return false
+    }
+    
+    await ui.init()
     console.log('✅ TON Connect initialized successfully')
     return true
   } catch (error) {
@@ -38,9 +64,18 @@ export const initTonConnect = async () => {
 
 // Получение адреса кошелька
 export const getWalletAddress = () => {
-  if (!isBrowser || !tonConnectUI) return null
-  const wallet = tonConnectUI.account
-  return wallet?.address || null
+  if (!isBrowser) return null
+  
+  try {
+    const { tonConnectUI: ui } = initTonConnectSDK()
+    if (!ui) return null
+    
+    const wallet = ui.account
+    return wallet?.address || null
+  } catch (error) {
+    console.error('Error getting wallet address:', error)
+    return null
+  }
 }
 
 // Получение баланса TON
@@ -57,11 +92,16 @@ export const getTonBalance = async (address: string) => {
 
 // Отправка TON
 export const sendTon = async (toAddress: string, amount: number, comment?: string) => {
-  if (!isBrowser || !tonConnectUI) {
-    throw new Error('TON Connect not available')
+  if (!isBrowser) {
+    throw new Error('TON Connect not available in SSR')
   }
   
   try {
+    const { tonConnectUI: ui } = initTonConnectSDK()
+    if (!ui) {
+      throw new Error('TON Connect UI not available')
+    }
+    
     const transaction = {
       messages: [
         {
@@ -73,7 +113,7 @@ export const sendTon = async (toAddress: string, amount: number, comment?: strin
       validUntil: Math.floor(Date.now() / 1000) + 600 // 10 минут
     }
 
-    const result = await tonConnectUI.sendTransaction(transaction)
+    const result = await ui.sendTransaction(transaction)
     return result
   } catch (error) {
     console.error('Error sending TON:', error)
