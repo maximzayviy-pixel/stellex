@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { X, CreditCard, Star, ArrowRight } from 'lucide-react'
 import { Card, TopUpData } from '@/types'
+import { vibrate } from '@/lib/vibration'
 
 interface TopUpModalProps {
   card: Card
@@ -71,7 +72,10 @@ export default function TopUpModal({ card, onClose, onTopUp }: TopUpModalProps) 
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-gray-900">Пополнение карты</h2>
             <button
-              onClick={onClose}
+              onClick={() => {
+                vibrate('tap')
+                onClose()
+              }}
               className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors"
             >
               <X className="w-5 h-5" />
@@ -121,7 +125,10 @@ export default function TopUpModal({ card, onClose, onTopUp }: TopUpModalProps) 
                   <button
                     key={quickAmount}
                     type="button"
-                    onClick={() => setAmount(quickAmount.toString())}
+                    onClick={() => {
+                      vibrate('tap')
+                      setAmount(quickAmount.toString())
+                    }}
                     className="py-2 px-3 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium transition-colors"
                   >
                     {quickAmount}

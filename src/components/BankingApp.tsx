@@ -311,7 +311,10 @@ export default function BankingApp() {
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={() => setShowTickets(true)}
+                  onClick={() => {
+                    vibrate('tap')
+                    setShowTickets(true)
+                  }}
                   className="py-3 px-6 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold rounded-xl hover:from-purple-700 hover:to-blue-700 transition-all duration-300"
                 >
                   Мои заявки
@@ -319,7 +322,10 @@ export default function BankingApp() {
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={() => setShowTickets(true)}
+                  onClick={() => {
+                    vibrate('tap')
+                    setShowTickets(true)
+                  }}
                   className="py-3 px-6 bg-gradient-to-r from-green-600 to-teal-600 text-white font-bold rounded-xl hover:from-green-700 hover:to-teal-700 transition-all duration-300"
                 >
                   Создать заявку

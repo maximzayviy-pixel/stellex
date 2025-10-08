@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { X, Send, ArrowRight, User, CreditCard } from 'lucide-react'
 import { Card } from '@/types'
+import { vibrate } from '@/lib/vibration'
 
 interface TransferModalProps {
   cards: Card[]
@@ -96,7 +97,10 @@ export default function TransferModal({ cards, onClose, onTransfer, showNotifica
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-gray-900">Перевод</h2>
             <button
-              onClick={onClose}
+              onClick={() => {
+                vibrate('tap')
+                onClose()
+              }}
               className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors"
             >
               <X className="w-5 h-5" />
@@ -178,7 +182,10 @@ export default function TransferModal({ cards, onClose, onTransfer, showNotifica
                   <button
                     key={quickAmount}
                     type="button"
-                    onClick={() => setAmount(quickAmount.toString())}
+                    onClick={() => {
+                      vibrate('tap')
+                      setAmount(quickAmount.toString())
+                    }}
                     className="py-2 px-3 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium transition-colors"
                   >
                     {quickAmount}

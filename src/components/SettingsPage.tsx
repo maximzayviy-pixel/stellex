@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import { vibrate } from '@/lib/vibration'
 import { 
   User, 
   Bell, 
@@ -164,7 +165,10 @@ export default function SettingsPage({ user, onBack, onUpdateUser }: SettingsPag
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-3">
             <button
-              onClick={onBack}
+              onClick={() => {
+                vibrate('tap')
+                onBack()
+              }}
               className="p-2 rounded-xl bg-white/10 hover:bg-white/20 transition-colors"
             >
               <ArrowLeft className="w-5 h-5 text-white" />
@@ -200,7 +204,10 @@ export default function SettingsPage({ user, onBack, onUpdateUser }: SettingsPag
                   return (
                     <button
                       key={tab.id}
-                      onClick={() => setActiveTab(tab.id as any)}
+                      onClick={() => {
+                        vibrate('selection')
+                        setActiveTab(tab.id as any)
+                      }}
                       className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-colors ${
                         isActive 
                           ? 'bg-purple-600 text-white' 
@@ -279,7 +286,10 @@ export default function SettingsPage({ user, onBack, onUpdateUser }: SettingsPag
                   </div>
 
                   <button
-                    onClick={handleSaveProfile}
+                    onClick={() => {
+                      vibrate('tap')
+                      handleSaveProfile()
+                    }}
                     disabled={isLoading}
                     className="mt-6 w-full py-3 px-4 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors flex items-center justify-center space-x-2 disabled:opacity-50"
                   >
@@ -358,7 +368,10 @@ export default function SettingsPage({ user, onBack, onUpdateUser }: SettingsPag
                   </div>
 
                   <button
-                    onClick={handleSaveSecurity}
+                    onClick={() => {
+                      vibrate('tap')
+                      handleSaveSecurity()
+                    }}
                     disabled={isLoading || securityData.newPassword !== securityData.confirmPassword}
                     className="mt-6 w-full py-3 px-4 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors flex items-center justify-center space-x-2 disabled:opacity-50"
                   >
@@ -399,7 +412,10 @@ export default function SettingsPage({ user, onBack, onUpdateUser }: SettingsPag
                           </p>
                         </div>
                         <button
-                          onClick={() => setNotificationSettings(prev => ({ ...prev, [key]: !value }))}
+                          onClick={() => {
+                          vibrate('selection')
+                          setNotificationSettings(prev => ({ ...prev, [key]: !value }))
+                        }}
                           className={`w-12 h-6 rounded-full transition-colors ${
                             value ? 'bg-purple-600' : 'bg-white/20'
                           }`}
@@ -413,7 +429,10 @@ export default function SettingsPage({ user, onBack, onUpdateUser }: SettingsPag
                   </div>
 
                   <button
-                    onClick={handleSaveNotifications}
+                    onClick={() => {
+                      vibrate('tap')
+                      handleSaveNotifications()
+                    }}
                     disabled={isLoading}
                     className="mt-6 w-full py-3 px-4 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors flex items-center justify-center space-x-2 disabled:opacity-50"
                   >
@@ -446,7 +465,10 @@ export default function SettingsPage({ user, onBack, onUpdateUser }: SettingsPag
                         ].map((theme) => (
                           <button
                             key={theme.id}
-                            onClick={() => setAppearanceSettings(prev => ({ ...prev, theme: theme.id as any }))}
+                            onClick={() => {
+                              vibrate('selection')
+                              setAppearanceSettings(prev => ({ ...prev, theme: theme.id as any }))
+                            }}
                             className={`p-4 rounded-xl border-2 transition-colors ${
                               appearanceSettings.theme === theme.id
                                 ? 'border-purple-500 bg-purple-500/20'
@@ -491,7 +513,10 @@ export default function SettingsPage({ user, onBack, onUpdateUser }: SettingsPag
                   </div>
 
                   <button
-                    onClick={handleSaveAppearance}
+                    onClick={() => {
+                      vibrate('tap')
+                      handleSaveAppearance()
+                    }}
                     disabled={isLoading}
                     className="mt-6 w-full py-3 px-4 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors flex items-center justify-center space-x-2 disabled:opacity-50"
                   >
