@@ -11,6 +11,9 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.74.0",
+    "@telegram-apps/init-data-node": "^2.0.10",
+    "@telegram-apps/sdk": "^1.0.0",
+    "@tma.js/init-data-node": "^2.0.1",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/qrcode": "^1.5.5",

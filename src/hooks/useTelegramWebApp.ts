@@ -112,6 +112,9 @@ export function useTelegramWebApp(): UseTelegramWebAppReturn {
         colorScheme: tg.colorScheme
       })
 
+      // Используем стандартный initData из Telegram WebApp
+      console.log('Using standard initData from Telegram WebApp')
+
       // Проверяем initData - если WebApp найден, считаем его валидным
       // initData может быть пустым при тестировании или при открытии через прямую ссылку
       if (!tg.initData && !tg.initDataUnsafe?.user) {

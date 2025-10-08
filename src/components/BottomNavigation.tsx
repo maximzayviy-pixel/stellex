@@ -3,6 +3,7 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 import { CreditCard, History, Settings, MessageSquare } from 'lucide-react'
+import { vibrate, vibrationPatterns, initVibration } from '@/lib/vibration'
 
 interface BottomNavigationProps {
   activeTab: 'cards' | 'history' | 'settings' | 'support'
@@ -43,7 +44,10 @@ export default function BottomNavigation({ activeTab, onTabChange }: BottomNavig
           return (
             <motion.button
               key={tab.id}
-              onClick={() => onTabChange(tab.id)}
+              onClick={() => {
+                vibrate('selection')
+                onTabChange(tab.id)
+              }}
                     className={`flex flex-col items-center space-y-1 py-1 px-2 rounded-xl transition-colors ${
                 isActive 
                   ? 'text-purple-400 bg-purple-500/20' 

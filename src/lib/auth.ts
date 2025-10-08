@@ -2,14 +2,29 @@ import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
 import { User } from '@/types'
 import { supabaseAdmin } from './supabase'
+import { validate, parse, type InitData } from '@tma.js/init-data-node'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
+const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || ''
 
 export interface AuthResult {
   success: boolean
   user?: User
   token?: string
   error?: string
+}
+
+export interface TelegramInitData {
+  user?: {
+    id: number
+    first_name: string
+    last_name?: string
+    username?: string
+    language_code?: string
+    is_premium?: boolean
+  }
+  auth_date: number
+  hash: string
 }
 
 export async function authenticateUser(telegramId: number, userData: { first_name: string; last_name?: string; username?: string; language_code?: string; is_premium?: boolean }): Promise<AuthResult> {
@@ -250,5 +265,114 @@ export async function getUserById(userId: string): Promise<User | null> {
   } catch (error) {
     console.error('Get user error:', error)
     return null
+  }
+}
+
+/**
+ * Авторизация пользователя через Telegram init data
+ * Согласно официальной документации: https://docs.telegram-mini-apps.com/platform/authorizing-user
+ */
+export async function authenticateTelegramInitData(initDataRaw: string): Promise<AuthResult> {
+  try {
+    if (!BOT_TOKEN) {
+      console.error('TELEGRAM_BOT_TOKEN not configured')
+      return { success: false, error: 'Bot token not configured' }
+    }
+
+    // Валидируем init data
+    validate(initDataRaw, BOT_TOKEN, {
+      // Считаем подпись действительной в течение 1 часа
+      expiresIn: 3600,
+    })
+
+    // Парсим init data
+    const initData = parse(initDataRaw)
+
+    if (!initData.user) {
+      return { success: false, error: 'User data not found in init data' }
+    }
+
+    const telegramUser = initData.user
+    const telegramId = telegramUser.id
+
+    // Ищем пользователя по Telegram ID
+    const { data: existingUser, error: fetchError } = await supabaseAdmin.value
+      .from('users')
+      .select('*')
+      .eq('telegram_id', telegramId)
+      .single()
+
+    if (fetchError && fetchError.code !== 'PGRST116') {
+      console.error('Error fetching user:', fetchError)
+      return { success: false, error: 'Ошибка базы данных' }
+    }
+
+    let user: User
+
+    if (existingUser) {
+      // Обновляем данные существующего пользователя
+      const updateData = {
+        first_name: telegramUser.first_name,
+        last_name: telegramUser.last_name,
+        username: telegramUser.username,
+        language_code: telegramUser.language_code,
+        is_premium: telegramUser.is_premium,
+        updated_at: new Date().toISOString()
+      }
+      
+      const { data: updatedUser, error: updateError } = await supabaseAdmin.value
+        .from('users')
+        .update(updateData)
+        .eq('id', existingUser.id)
+        .select()
+        .single()
+
+      if (updateError) {
+        console.error('Error updating user:', updateError)
+        return { success: false, error: 'Ошибка обновления пользователя' }
+      }
+
+      user = updatedUser
+    } else {
+      // Создаем нового пользователя
+      const { data: newUser, error: createError } = await supabaseAdmin.value
+        .from('users')
+        .insert({
+          telegram_id: telegramId,
+          first_name: telegramUser.first_name,
+          last_name: telegramUser.last_name,
+          username: telegramUser.username,
+          language_code: telegramUser.language_code,
+          is_premium: telegramUser.is_premium,
+          role: 'user',
+          total_spent: 0,
+          email_verified: false
+        })
+        .select()
+        .single()
+
+      if (createError) {
+        console.error('User creation error:', createError)
+        return { success: false, error: 'Ошибка создания пользователя' }
+      }
+
+      user = newUser
+    }
+
+    // Генерируем JWT токен
+    const token = jwt.sign(
+      { 
+        userId: user.id, 
+        telegramId: user.telegram_id,
+        role: user.role 
+      },
+      JWT_SECRET,
+      { expiresIn: '30d' }
+    )
+
+    return { success: true, user, token }
+  } catch (error) {
+    console.error('Telegram init data auth error:', error)
+    return { success: false, error: 'Ошибка авторизации через Telegram' }
   }
 }

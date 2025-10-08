@@ -17,6 +17,7 @@ import {
   ChevronDown
 } from 'lucide-react'
 import { Card, User } from '@/types'
+import { vibrate, vibrationPatterns, initVibration } from '@/lib/vibration'
 
 interface HomePageProps {
   user: User
@@ -100,7 +101,10 @@ export default function HomePage({
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={() => showNotification('Скоро здесь появятся пластиковые карты!')}
+            onClick={() => {
+              vibrate('tap')
+              showNotification('Скоро здесь появятся пластиковые карты!')
+            }}
             className="p-4 bg-white/10 rounded-xl text-center hover:bg-white/20 transition-colors"
           >
             <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-2">
@@ -112,7 +116,10 @@ export default function HomePage({
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={() => showNotification('Мои подписки - в разработке')}
+            onClick={() => {
+              vibrate('tap')
+              showNotification('Мои подписки - в разработке')
+            }}
             className="p-4 bg-white/10 rounded-xl text-center hover:bg-white/20 transition-colors"
           >
             <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-2">
@@ -124,7 +131,10 @@ export default function HomePage({
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={() => window.open('https://t.me/stellexbank_bot', '_blank')}
+            onClick={() => {
+              vibrate('tap')
+              window.open('https://t.me/stellexbank_bot', '_blank')
+            }}
             className="p-4 bg-white/10 rounded-xl text-center hover:bg-white/20 transition-colors"
           >
             <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-2">
@@ -172,7 +182,10 @@ export default function HomePage({
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl p-4 text-white shadow-lg cursor-pointer hover:shadow-xl transition-shadow"
-                onClick={() => onCardClick(card)}
+                onClick={() => {
+                  vibrate('tap')
+                  onCardClick(card)
+                }}
               >
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-3">

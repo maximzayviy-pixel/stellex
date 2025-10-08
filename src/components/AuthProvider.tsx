@@ -49,7 +49,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             if (isReady && tgUser) {
               console.log('In Telegram Web App with user data, authenticating...', tgUser)
               // Авторизуемся через Telegram
-              await authenticateWithTelegram(tgUser)
+              await authenticateWithTelegram(initData)
             } else if (isReady && !tgUser) {
               // Telegram WebApp готов, но нет данных пользователя - показываем инструкции
               console.log('Telegram WebApp ready but no user data, showing instructions')
@@ -117,16 +117,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-         const authenticateWithTelegram = async (tgUser: { id: number; first_name: string; last_name?: string; username?: string; language_code?: string; is_premium?: boolean }) => {
+         const authenticateWithTelegram = async (initData: string) => {
            try {
-             console.log('Sending Telegram user data to API:', tgUser)
+             console.log('Sending Telegram init data to API:', initData)
              
-             const response = await fetch('/api/auth/telegram', {
+             const response = await fetch('/api/auth/telegram-init', {
                method: 'POST',
                headers: {
                  'Content-Type': 'application/json'
                },
-               body: JSON.stringify(tgUser)
+               body: JSON.stringify({ initData })
              })
 
              console.log('API response status:', response.status)
@@ -183,7 +183,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } else {
       if (isTelegramWebApp && isReady) {
         if (tgUser) {
-          authenticateWithTelegram(tgUser)
+          authenticateWithTelegram(initData)
         } else {
           setShowWebLogin(true)
           setLoading(false)

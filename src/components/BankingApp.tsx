@@ -27,7 +27,7 @@ import BottomNavigation from './BottomNavigation'
 import { Card, TopUpData, User } from '@/types'
 import { supabaseAdmin } from '@/lib/supabase'
 import { useAuth } from './AuthProvider'
-import { vibrate, vibrationPatterns } from '@/lib/vibration'
+import { vibrate, vibrationPatterns, initVibration } from '@/lib/vibration'
 import DeveloperDashboard from './DeveloperDashboard'
 import SupportDashboard from './SupportDashboard'
 import AdminDashboard from './AdminDashboard'
@@ -48,6 +48,11 @@ export default function BankingApp() {
   const [selectedCard, setSelectedCard] = useState<Card | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [activeTab, setActiveTab] = useState<'cards' | 'history' | 'settings' | 'support'>('cards')
+
+  const handleTabChange = (tab: 'cards' | 'history' | 'settings' | 'support') => {
+    vibrate('selection')
+    setActiveTab(tab)
+  }
   const [showCardDetailsModal, setShowCardDetailsModal] = useState(false)
   const [showTickets, setShowTickets] = useState(false)
   const [showPreloader, setShowPreloader] = useState(false)
@@ -65,6 +70,8 @@ export default function BankingApp() {
         loadUserData()
       }
     }
+    // Инициализируем вибрацию при загрузке компонента
+    initVibration()
   }, [user])
 
   // Проверяем PIN-код при загрузке
@@ -172,15 +179,15 @@ export default function BankingApp() {
 
       if (result.success) {
         await loadUserData()
-        vibrate(vibrationPatterns.success)
+        vibrate('success')
         showNotification('Перевод выполнен!')
       } else {
-        vibrate(vibrationPatterns.error)
+        vibrate('error')
         showNotification(result.error || 'Ошибка перевода')
       }
     } catch (error) {
       console.error('Transfer error:', error)
-      vibrate(vibrationPatterns.error)
+      vibrate('error')
       showNotification('Ошибка перевода')
     }
   }
@@ -201,20 +208,21 @@ export default function BankingApp() {
 
       if (result.success) {
         await loadUserData()
-        vibrate(vibrationPatterns.success)
+        vibrate('success')
         showNotification('Баланс пополнен звездами!')
       } else {
-        vibrate(vibrationPatterns.error)
+        vibrate('error')
         showNotification(result.error || 'Ошибка пополнения')
       }
     } catch (error) {
       console.error('Telegram Stars top-up error:', error)
-      vibrate(vibrationPatterns.error)
+      vibrate('error')
       showNotification('Ошибка пополнения')
     }
   }
 
   const handleCardExpand = (card: Card) => {
+    vibrate(vibrationPatterns.tap)
     setSelectedCard(card)
     setShowCardDetailsModal(true)
   }
@@ -289,7 +297,7 @@ export default function BankingApp() {
       )}
 
       {activeTab === 'history' && (
-        <TransactionHistoryPage onBack={() => setActiveTab('cards')} />
+        <TransactionHistoryPage onBack={() => handleTabChange('cards')} />
       )}
 
       {activeTab === 'support' && (
@@ -323,11 +331,11 @@ export default function BankingApp() {
       )}
 
       {activeTab === 'settings' && (
-        <SettingsPage user={currentUser} onBack={() => setActiveTab('cards')} onUpdateUser={handleUpdateUser} />
+        <SettingsPage user={currentUser} onBack={() => handleTabChange('cards')} onUpdateUser={handleUpdateUser} />
       )}
 
       {/* Bottom Navigation */}
-      <BottomNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+      <BottomNavigation activeTab={activeTab} onTabChange={handleTabChange} />
 
       {/* Modals */}
       <AnimatePresence>
@@ -335,6 +343,7 @@ export default function BankingApp() {
           <TopUpModal
             card={selectedCard}
             onClose={() => {
+              vibrate('tap')
               setShowTopUpModal(false)
               setSelectedCard(null)
             }}
@@ -345,7 +354,10 @@ export default function BankingApp() {
         {showTransferModal && (
           <TransferModal
             cards={cards}
-            onClose={() => setShowTransferModal(false)}
+            onClose={() => {
+              vibrate('tap')
+              setShowTransferModal(false)
+            }}
             onTransfer={handleTransfer}
             showNotification={showNotification}
           />
@@ -354,7 +366,10 @@ export default function BankingApp() {
         {showTelegramStarsModal && (
           <TelegramStarsModal
             cards={cards}
-            onClose={() => setShowTelegramStarsModal(false)}
+            onClose={() => {
+              vibrate('tap')
+              setShowTelegramStarsModal(false)
+            }}
             onTopUp={handleTelegramStarsTopUp}
             showNotification={showNotification}
           />
@@ -363,7 +378,10 @@ export default function BankingApp() {
         {showQRCodeModal && (
           <QRCodeModal
             cards={cards}
-            onClose={() => setShowQRCodeModal(false)}
+            onClose={() => {
+              vibrate('tap')
+              setShowQRCodeModal(false)
+            }}
             showNotification={showNotification}
           />
         )}
@@ -372,22 +390,27 @@ export default function BankingApp() {
           <CardDetailsModal
             card={selectedCard}
             onClose={() => {
+              vibrate('tap')
               setShowCardDetailsModal(false)
               setSelectedCard(null)
             }}
             onTopUp={() => {
+              vibrate('tap')
               setShowCardDetailsModal(false)
               setShowTopUpModal(true)
             }}
             onTransfer={() => {
+              vibrate('tap')
               setShowCardDetailsModal(false)
               setShowTransferModal(true)
             }}
             onQRCode={() => {
+              vibrate('tap')
               setShowCardDetailsModal(false)
               setShowQRCodeModal(true)
             }}
             onScan={() => {
+              vibrate('tap')
               setShowCardDetailsModal(false)
               setShowQRCodeModal(true)
             }}
@@ -397,7 +420,10 @@ export default function BankingApp() {
 
         {showTickets && (
           <UserTicketsModal
-            onClose={() => setShowTickets(false)}
+            onClose={() => {
+              vibrate('tap')
+              setShowTickets(false)
+            }}
           />
         )}
       </AnimatePresence>
