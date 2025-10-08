@@ -43,23 +43,64 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Для разработчика обновляем ключ в БД
-    const { data: developer, error: devError } = await supabaseAdmin.value
+    // Для разработчика сначала проверяем, существует ли запись
+    const { data: existingDeveloper, error: checkError } = await supabaseAdmin.value
       .from('developers')
-      .update({ 
-        api_key: apiKey,
-        updated_at: new Date().toISOString()
-      })
+      .select('id')
       .eq('user_id', decoded.userId)
-      .select()
       .single()
 
-    if (devError) {
-      console.error('Error updating API key:', devError)
+    if (checkError && checkError.code !== 'PGRST116') {
+      console.error('Error checking developer:', checkError)
       return NextResponse.json(
-        { success: false, error: 'Ошибка обновления API ключа' },
+        { success: false, error: 'Ошибка проверки разработчика' },
         { status: 500 }
       )
+    }
+
+    let developer
+    if (!existingDeveloper) {
+      // Создаем запись разработчика, если её нет
+      const { data: newDeveloper, error: createError } = await supabaseAdmin.value
+        .from('developers')
+        .insert({
+          user_id: decoded.userId,
+          api_key: apiKey,
+          is_active: true,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .select()
+        .single()
+
+      if (createError) {
+        console.error('Error creating developer:', createError)
+        return NextResponse.json(
+          { success: false, error: 'Ошибка создания записи разработчика' },
+          { status: 500 }
+        )
+      }
+      developer = newDeveloper
+    } else {
+      // Обновляем существующую запись
+      const { data: updatedDeveloper, error: updateError } = await supabaseAdmin.value
+        .from('developers')
+        .update({ 
+          api_key: apiKey,
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', decoded.userId)
+        .select()
+        .single()
+
+      if (updateError) {
+        console.error('Error updating API key:', updateError)
+        return NextResponse.json(
+          { success: false, error: 'Ошибка обновления API ключа' },
+          { status: 500 }
+        )
+      }
+      developer = updatedDeveloper
     }
 
     return NextResponse.json({

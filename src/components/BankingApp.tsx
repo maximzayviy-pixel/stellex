@@ -27,6 +27,7 @@ import BottomNavigation from './BottomNavigation'
 import { Card, TopUpData, User } from '@/types'
 import { supabaseAdmin } from '@/lib/supabase'
 import { useAuth } from './AuthProvider'
+import { vibrate, vibrationPatterns } from '@/lib/vibration'
 import DeveloperDashboard from './DeveloperDashboard'
 import SupportDashboard from './SupportDashboard'
 import AdminDashboard from './AdminDashboard'
@@ -49,14 +50,20 @@ export default function BankingApp() {
   const [activeTab, setActiveTab] = useState<'cards' | 'history' | 'settings' | 'support'>('cards')
   const [showCardDetailsModal, setShowCardDetailsModal] = useState(false)
   const [showTickets, setShowTickets] = useState(false)
-  const [showPreloader, setShowPreloader] = useState(true)
+  const [showPreloader, setShowPreloader] = useState(false)
   const [currentUser, setCurrentUser] = useState(user)
 
   // Загружаем данные пользователя и карты
   useEffect(() => {
     if (user) {
       setCurrentUser(user)
-      loadUserData()
+      // Проверяем, есть ли PIN-код
+      const savedPin = localStorage.getItem('user_pin')
+      if (!savedPin) {
+        setShowPreloader(true)
+      } else {
+        loadUserData()
+      }
     }
   }, [user])
 
@@ -138,6 +145,7 @@ export default function BankingApp() {
   }
 
   const handleTopUp = (data: TopUpData) => {
+    vibrate(vibrationPatterns.tap)
     const card = cards.find(c => c.id === data.cardId)
     if (card) {
       setSelectedCard(card)
@@ -146,6 +154,7 @@ export default function BankingApp() {
   }
 
   const handleTransfer = async (data: { fromCardId: string; toCardNumber: string; amount: number }) => {
+    vibrate(vibrationPatterns.tap)
     try {
       const response = await fetch('/api/transfer', {
         method: 'POST',
@@ -160,17 +169,21 @@ export default function BankingApp() {
 
       if (result.success) {
         await loadUserData()
+        vibrate(vibrationPatterns.success)
         showNotification('Перевод выполнен!')
       } else {
+        vibrate(vibrationPatterns.error)
         showNotification(result.error || 'Ошибка перевода')
       }
     } catch (error) {
       console.error('Transfer error:', error)
+      vibrate(vibrationPatterns.error)
       showNotification('Ошибка перевода')
     }
   }
 
   const handleTelegramStarsTopUp = async (data: { cardId: string; starsAmount: number }) => {
+    vibrate(vibrationPatterns.tap)
     try {
       const response = await fetch('/api/telegram-stars/topup', {
         method: 'POST',
@@ -185,12 +198,15 @@ export default function BankingApp() {
 
       if (result.success) {
         await loadUserData()
+        vibrate(vibrationPatterns.success)
         showNotification('Баланс пополнен звездами!')
       } else {
+        vibrate(vibrationPatterns.error)
         showNotification(result.error || 'Ошибка пополнения')
       }
     } catch (error) {
       console.error('Telegram Stars top-up error:', error)
+      vibrate(vibrationPatterns.error)
       showNotification('Ошибка пополнения')
     }
   }
@@ -225,7 +241,10 @@ export default function BankingApp() {
     return (
       <CosmicPreloader
         user={user}
-        onComplete={() => setShowPreloader(false)}
+        onComplete={() => {
+          setShowPreloader(false)
+          loadUserData()
+        }}
       />
     )
   }
